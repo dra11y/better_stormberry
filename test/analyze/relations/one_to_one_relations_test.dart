@@ -12,10 +12,10 @@ void main() {
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B get b;
         }
-        
+
         @Model()
         abstract class B {
           String get name;
@@ -67,15 +67,16 @@ void main() {
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
           String get id;
-          
+
+          @HiddenIn.defaultView()
           A get a;
         }
       ''');
@@ -99,14 +100,15 @@ void main() {
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B get b;
         }
-        
+
         @Model()
         abstract class B {
           String get name;
-          
+
+          @HiddenIn.defaultView()
           A get a;
         }
       ''');
