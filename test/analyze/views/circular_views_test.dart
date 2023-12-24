@@ -6,21 +6,21 @@ void main() {
   group('analyzing builder', () {
     test('analyzes non-modified circular views', () async {
       analyze() => analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B? get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
           String get id;
-          
+
           A? get a;
         }
       ''');

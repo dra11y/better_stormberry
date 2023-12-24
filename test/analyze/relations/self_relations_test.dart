@@ -6,7 +6,7 @@ void main() {
   group('analyzing builder', () {
     test('analyzes self one-to-many relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
@@ -54,7 +54,7 @@ void main() {
 
     test('analyzes self many-to-one relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
@@ -102,7 +102,7 @@ void main() {
 
     test('analyzes self multi many-to-one relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
@@ -176,7 +176,7 @@ void main() {
 
     test('analyzes self multi many-to-one relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {

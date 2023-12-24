@@ -1,4 +1,4 @@
-import '../../../stormberry.dart';
+import '../../../better_stormberry.dart';
 
 import 'differentiator.dart';
 import 'schema.dart';
@@ -6,7 +6,7 @@ import 'schema.dart';
 Future<void> patchSchema(Database db, DatabaseSchemaDiff diff) async {
   for (var table in diff.tables.added) {
     await db.query("""
-        CREATE TABLE IF NOT EXISTS "${table.name}" ( 
+        CREATE TABLE IF NOT EXISTS "${table.name}" (
           ${table.columns.values.map((c) => '"${c.name}" ${c.type} ${c.isNullable ? 'NULL' : 'NOT NULL'}').join(",")}
         )
       """);

@@ -1,15 +1,15 @@
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
-import 'package:stormberry/src/builder/builders/analyzing_builder.dart';
-import 'package:stormberry/src/builder/elements/column/column_element.dart';
-import 'package:stormberry/src/builder/elements/column/field_column_element.dart';
-import 'package:stormberry/src/builder/elements/column/foreign_column_element.dart';
-import 'package:stormberry/src/builder/elements/column/join_column_element.dart';
-import 'package:stormberry/src/builder/elements/column/reference_column_element.dart';
-import 'package:stormberry/src/builder/elements/column/view_column_element.dart';
-import 'package:stormberry/src/builder/elements/join_table_element.dart';
-import 'package:stormberry/src/builder/elements/table_element.dart';
-import 'package:stormberry/src/builder/schema.dart';
+import 'package:better_stormberry/src/builder/builders/analyzing_builder.dart';
+import 'package:better_stormberry/src/builder/elements/column/column_element.dart';
+import 'package:better_stormberry/src/builder/elements/column/field_column_element.dart';
+import 'package:better_stormberry/src/builder/elements/column/foreign_column_element.dart';
+import 'package:better_stormberry/src/builder/elements/column/join_column_element.dart';
+import 'package:better_stormberry/src/builder/elements/column/reference_column_element.dart';
+import 'package:better_stormberry/src/builder/elements/column/view_column_element.dart';
+import 'package:better_stormberry/src/builder/elements/join_table_element.dart';
+import 'package:better_stormberry/src/builder/elements/table_element.dart';
+import 'package:better_stormberry/src/builder/schema.dart';
 import 'package:test/test.dart';
 
 import '../polyfill.dart';

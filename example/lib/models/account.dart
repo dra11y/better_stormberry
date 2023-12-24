@@ -1,4 +1,4 @@
-import 'package:stormberry/stormberry.dart';
+import 'package:better_stormberry/better_stormberry.dart';
 
 import 'address.dart';
 import 'company.dart';

@@ -6,21 +6,21 @@ void main() {
   group('analyzing builder', () {
     test('analyzes two-sided double-keyed many-to-many relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           List<B> get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
           String get id;
-          
+
           @HiddenIn.defaultView()
           List<A> get a;
         }
@@ -73,20 +73,20 @@ void main() {
 
     test('analyzes two-sided single-keyed many-to-many relation', () async {
       caller() => analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           List<B> get b;
         }
-        
+
         @Model()
         abstract class B {
           String get name;
-          
+
           List<A> get a;
         }
       ''');

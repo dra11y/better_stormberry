@@ -6,16 +6,16 @@ void main() {
   group('analyzing builder', () {
     test('analyzes one-sided double-keyed many-to-one relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           List<B> get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
@@ -62,16 +62,16 @@ void main() {
 
     test('analyzes one-sided single-keyed many-to-one relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           List<B> get b;
         }
-        
+
         @Model()
         abstract class B {
           String get name;
@@ -117,21 +117,21 @@ void main() {
 
     test('analyzes two-sided double-keyed many-to-one relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           List<B> get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
           String get id;
-          
+
           @HiddenIn.defaultView()
           A get a;
         }
@@ -176,20 +176,20 @@ void main() {
 
     test('analyzes two-sided single-keyed many-to-one relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           List<B> get b;
         }
-        
+
         @Model()
         abstract class B {
           String get name;
-          
+
           @HiddenIn.defaultView()
           A get a;
         }

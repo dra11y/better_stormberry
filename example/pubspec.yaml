@@ -6,7 +6,7 @@ environment:
 
 dependencies:
   dart_mappable: ^4.1.0
-  stormberry:
+  better_stormberry:
     path: ../
 
 dev_dependencies:

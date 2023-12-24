@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import '../../../stormberry.dart';
+import '../../../better_stormberry.dart';
 
 import 'inspector.dart';
 import 'schema.dart';

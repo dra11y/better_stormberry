@@ -1,7 +1,7 @@
-import 'package:stormberry/src/cli/migration/differentiator.dart';
-import 'package:stormberry/src/cli/migration/patcher.dart';
-import 'package:stormberry/src/cli/migration/schema.dart';
-import 'package:stormberry/stormberry.dart';
+import 'package:better_stormberry/src/cli/migration/differentiator.dart';
+import 'package:better_stormberry/src/cli/migration/patcher.dart';
+import 'package:better_stormberry/src/cli/migration/schema.dart';
+import 'package:better_stormberry/better_stormberry.dart';
 import 'package:test/test.dart';
 
 class StormberryTester {
@@ -17,7 +17,7 @@ StormberryTester useTester({String? schema, bool cleanup = false}) {
         port: 5432,
         database: 'postgres',
         user: 'postgres',
-        password: 'postgres');
+        password: 'postgres', debugPrint: false);
     if (schema != null) {
       await tester.db.migrateTo(schema);
     }
@@ -37,7 +37,7 @@ StormberryTester useTester({String? schema, bool cleanup = false}) {
 extension SchemaChanger on Database {
   Future<DatabaseSchemaDiff> migrateTo(String glob, {bool log = true}) async {
     var schema = await DatabaseSchema.load(
-      '.dart_tool/build/generated/stormberry/test/$glob.schema.json',
+      '.dart_tool/build/generated/better_stormberry/test/$glob.schema.json',
     );
 
     var diff = await getSchemaDiff(this, schema);

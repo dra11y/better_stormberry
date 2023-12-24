@@ -1,4 +1,4 @@
-import 'package:stormberry/stormberry.dart';
+import 'package:better_stormberry/better_stormberry.dart';
 import 'package:test/test.dart';
 
 import '../config/tester.dart';
@@ -9,6 +9,12 @@ void testInsert() {
     var tester = useTester(schema: 'integration/*', cleanup: true);
 
     test('single object', () async {
+      print('trying to get tables...');
+      final tables = await tester.db.query("SELECT * FROM information_schema.tables WHERE table_schema = 'integration';");
+      print('tables count: ${tables.length}');
+      for (final row in tables) {
+        print('table: $row');
+      }
       await tester.db.as.insertOne(AInsertRequest(
           id: 'abc', a: 'hello', b: 1, c: 0.1, d: true, e: [-2, 1234], f: [-0.5, 1.111, 123.45]));
 

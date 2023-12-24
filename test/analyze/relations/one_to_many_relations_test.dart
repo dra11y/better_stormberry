@@ -6,16 +6,16 @@ void main() {
   group('analyzing builder', () {
     test('analyzes one-sided double-keyed one-to-many relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
@@ -62,21 +62,21 @@ void main() {
 
     test('analyzes two-sided double-keyed one-to-many relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
           String get id;
-          
+
           @HiddenIn.defaultView()
           List<A> get a;
         }

@@ -6,13 +6,13 @@ void main() {
   group('analyzing builder', () {
     test('analyzes simple model', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class MyModel {
           @PrimaryKey()
           String get id;
-        
+
           String get data;
           int get number;
         }
@@ -34,7 +34,7 @@ void main() {
 
     test('analyzes field columns', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class MyModel {
@@ -128,7 +128,7 @@ void main() {
 
     test('analyzes default view', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class MyModel {

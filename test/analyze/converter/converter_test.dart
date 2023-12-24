@@ -1,4 +1,4 @@
-import 'package:stormberry/src/builder/elements/column/column_element.dart';
+import 'package:better_stormberry/src/builder/elements/column/column_element.dart';
 import 'package:test/test.dart';
 
 import '../utils.dart';
@@ -7,19 +7,19 @@ void main() {
   group('analyzing builder', () {
     test('analyzes used converter', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           @UseConverter(BConverter())
           B get b;
         }
-        
+
         class B {}
-        
+
         class BConverter extends TypeConverter<B> {
           const BConverter() : super('jsonb');
         }
@@ -45,19 +45,19 @@ void main() {
 
     test('analyzes used converter on nullable field', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           @UseConverter(BConverter())
           B? get b;
         }
-        
+
         class B {}
-        
+
         class BConverter extends TypeConverter<B> {
           const BConverter() : super('jsonb');
         }
@@ -83,16 +83,16 @@ void main() {
 
     test('analyzes unused converter', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B? get b;
         }
-        
+
         class B {}
       ''');
 

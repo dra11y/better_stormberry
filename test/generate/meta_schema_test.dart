@@ -12,8 +12,8 @@ void main() {
 
       setUpAll(() async {
         source = await generateSchema('''
-          import 'package:stormberry/stormberry.dart';
-  
+          import 'package:better_stormberry/better_stormberry.dart';
+
           @Model(views: [Model.defaultView, #Test], meta: ModelMeta(
             insert: ClassMeta(extend: 'InsertBase'),
             update: ClassMeta(extend: 'UpdateBase'),

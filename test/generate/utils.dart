@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:build/build.dart';
 import 'package:build_test/build_test.dart';
-import 'package:stormberry/src/builder/builders/analyzing_builder.dart';
-import 'package:stormberry/src/builder/builders/schema_builder.dart';
+import 'package:better_stormberry/src/builder/builders/analyzing_builder.dart';
+import 'package:better_stormberry/src/builder/builders/schema_builder.dart';
 import 'package:test/test.dart';
 
 import '../polyfill.dart';

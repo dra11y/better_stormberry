@@ -1,4 +1,4 @@
-import '../../../stormberry.dart';
+import '../../../better_stormberry.dart';
 import 'schema.dart';
 
 Future<DatabaseSchema> inspectDatabaseSchema(Database db) async {
@@ -42,19 +42,19 @@ Future<DatabaseSchema> inspectDatabaseSchema(Database db) async {
   }
 
   var constraints = await db.query("""
-      SELECT tc.constraint_name, tc.constraint_type, 
+      SELECT tc.constraint_name, tc.constraint_type,
         (array_agg(kcu.table_name))[1] as src_table,
         array_to_json(array_agg(DISTINCT kcu.column_name)) as src_columns,
         (array_agg(ccu.table_name))[1] as target_table,
         array_to_json(array_agg(DISTINCT ccu.column_name)) as target_columns,
         (array_agg(rf.update_rule))[1] as update_rule,
         (array_agg(rf.delete_rule))[1] as delete_rule
-      FROM information_schema.table_constraints AS tc 
-      JOIN information_schema.key_column_usage AS kcu 
+      FROM information_schema.table_constraints AS tc
+      JOIN information_schema.key_column_usage AS kcu
         ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
       LEFT JOIN information_schema.constraint_column_usage AS ccu
         ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
-      LEFT JOIN information_schema.referential_constraints rf 
+      LEFT JOIN information_schema.referential_constraints rf
         ON ccu.constraint_name = rf.constraint_name
       WHERE tc.constraint_schema = 'public'
       GROUP BY tc.constraint_name, tc.constraint_type

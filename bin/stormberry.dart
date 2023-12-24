@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:args/command_runner.dart';
-import 'package:stormberry/src/cli/runner.dart';
+import 'package:better_stormberry/src/cli/runner.dart';
 
 Future<void> main(List<String> args) async {
   var runner = CommandRunner<void>(

@@ -14,7 +14,7 @@ abstract class Book {
 ```
 
 ***Note**: The model class acts mostly as a blueprint for your database tables. It is recommended to not use
-this class directly in you application, but rather one of the generated entity classes. More on this later.* 
+this class directly in you application, but rather one of the generated entity classes. More on this later.*
 
 This model uses an additional `@PrimaryKey()` annotation on its `id` field. It will be translated into the following sql table:
 
@@ -128,7 +128,7 @@ abstract class MyModel {
 }
 ```
 
-Checkout the api documentation [here](../stormberry/TableIndex-class.html)
+Checkout the api documentation [here](../better_stormberry/TableIndex-class.html)
 for a description of the available parameters you can specify on an index.
 
 ## Converters
@@ -139,7 +139,7 @@ type. Implement a custom type converter like this:
 ```dart
 class LatLngConverter extends TypeConverter<LatLng> {
   const LatLngConverter() : super('point');
-  
+
   @override
   dynamic encode(LatLng value) => PgPoint(value.latitude, value.longitude);
 

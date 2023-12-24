@@ -1,4 +1,4 @@
-import 'package:stormberry/stormberry.dart';
+import 'package:better_stormberry/better_stormberry.dart';
 import 'package:test/test.dart';
 
 import '../config/tester.dart';

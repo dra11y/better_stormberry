@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:yaml/yaml.dart';
 
-import '../../stormberry.dart';
+import '../../better_stormberry.dart';
 import 'migration/differentiator.dart';
 import 'migration/output.dart';
 import 'migration/patcher.dart';

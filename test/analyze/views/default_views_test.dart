@@ -6,16 +6,16 @@ void main() {
   group('analyzing builder', () {
     test('analyzes one-sided double-keyed implicit default view', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
@@ -64,16 +64,16 @@ void main() {
 
     test('analyzes one-sided double-keyed explicit default view', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model(views: [Model.defaultView])
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           B get b;
         }
-        
+
         @Model()
         abstract class B {
           @PrimaryKey()
@@ -122,13 +122,13 @@ void main() {
 
     test('analyzes modified default view', () async {
       var schema = await analyzeSchema('''
-        import 'package:stormberry/stormberry.dart';
+        import 'package:better_stormberry/better_stormberry.dart';
 
         @Model()
         abstract class A {
           @PrimaryKey()
           String get id;
-        
+
           @HiddenIn(Model.defaultView)
           String get securityNumber;
         }

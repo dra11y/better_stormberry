@@ -12,13 +12,13 @@ void main() {
 
       setUpAll(() async {
         source = await generateSchema('''
-          import 'package:stormberry/stormberry.dart';
-  
+          import 'package:better_stormberry/better_stormberry.dart';
+
           @Model()
           abstract class A {
             @PrimaryKey()
             String get id;
-          
+
             @HiddenIn(Model.defaultView)
             String get secretId;
           }

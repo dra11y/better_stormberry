@@ -4,12 +4,17 @@ import 'dart:io';
 import 'package:glob/glob.dart';
 import 'package:file/local.dart';
 
-import '../../../stormberry.dart';
+import '../../../better_stormberry.dart';
 
 class DatabaseSchema {
   final Map<String, TableSchema> tables;
 
   const DatabaseSchema(this.tables);
+
+  @override
+  String toString() => '''DatabaseSchema(
+    tables: $tables
+  )''';
 
   DatabaseSchema copy() => DatabaseSchema(
         {for (var t in tables.entries) t.key: t.value.copy()},
@@ -84,6 +89,14 @@ class TableSchema {
     this.indexes = const [],
   });
 
+  @override
+  String toString() => '''TableSchema(
+    name: $name,
+    columns: $columns,
+    constraints: $constraints,
+    indexes: $indexes,
+  )''';
+
   TableSchema copy() => TableSchema(
         name,
         columns: {...columns},
@@ -101,6 +114,14 @@ class ColumnSchema {
   const ColumnSchema(this.name,
       {required this.type, this.isNullable = false, bool? isAutoIncrement})
       : isAutoIncrement = isAutoIncrement ?? (type == 'serial');
+
+  @override
+  String toString() => '''ColumnSchema(
+    name: $name,
+    type: $type,
+    isNullable: $isNullable,
+    isAutoIncrement: $isAutoIncrement,
+  )''';
 
   factory ColumnSchema.fromMap(String name, Map<String, dynamic> map) {
     return ColumnSchema(
