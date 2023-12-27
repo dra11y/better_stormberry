@@ -16,7 +16,7 @@ class AnalyzingBuilder implements Builder {
   AnalyzingBuilder(BuilderOptions options) : options = GlobalOptions.parse(options.config);
 
   @override
-  FutureOr<void> build(BuildStep buildStep) async {
+  Future<void> build(BuildStep buildStep) async {
     try {
       if (!await buildStep.resolver.isLibrary(buildStep.inputId)) {
         return;

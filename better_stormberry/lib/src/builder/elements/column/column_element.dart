@@ -66,14 +66,22 @@ abstract class ColumnElement {
   late DartObject? converter = () {
     if (parameter == null) return null;
 
-    var converters = useConverterChecker //
-        .annotationsOf(parameter!)
-        .followedBy(useConverterChecker.annotationsOf(parameter!.getter!));
-    if (converters.length > 1) {
-      throw 'Field annotated with multiple converters. You can only use one.';
-    }
+    final paramTypeChecker = TypeChecker.fromStatic(parameter!.type);
 
-    return converters.firstOrNull?.getField('converter');
+    return useConverterChecker
+        .annotationsOf(parameter!)
+        .followedBy(useConverterChecker.annotationsOf(parameter!.getter!))
+        .followedBy(useConverterChecker.annotationsOf(parameter!.type.element!))
+        .map((annotation) => annotation.getField('converter'))
+        .whereType<DartObject>()
+        .firstWhereOrNull((converter) {
+          final type = converter.type;
+          if (type is InterfaceType) {
+            final allTypes = [...type.typeArguments, ...type.allSupertypes.expand((t) => t.typeArguments)];
+            return allTypes.any((t) => paramTypeChecker.isAssignableFromType(t));
+          }
+          return false;
+        });
   }();
 
   void checkConverter();
