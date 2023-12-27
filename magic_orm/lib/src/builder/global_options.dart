@@ -7,11 +7,22 @@ class GlobalOptions {
   int lineLength;
 
   GlobalOptions.parse(Map<String, dynamic> options)
-      : tableCaseStyle = CaseStyle.fromString(options['tableCaseStyle'] as String? ??
-            options['table_case_style'] as String? ??
-            'snakeCase'),
-        columnCaseStyle = CaseStyle.fromString(options['columnCaseStyle'] as String? ??
-            options['column_case_style'] as String? ??
-            'snakeCase'),
-        lineLength = options['lineLength'] as int? ?? options['line_length'] as int? ?? 100;
+      : tableCaseStyle = CaseStyle.fromString(
+            options['tableCaseStyle'] as String? ??
+                options['table_case_style'] as String? ??
+                'snakeCase'),
+        columnCaseStyle = CaseStyle.fromString(
+            options['columnCaseStyle'] as String? ??
+                options['column_case_style'] as String? ??
+                'snakeCase'),
+        lineLength = options['lineLength'] as int? ??
+            options['line_length'] as int? ??
+            100;
+
+  @override
+  String toString() => '''GlobalOptions(
+    tableCaseStyle: $tableCaseStyle,
+    columnCaseStyle: $columnCaseStyle,
+    lineLength: $lineLength,
+  )''';
 }

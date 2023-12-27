@@ -10,7 +10,7 @@ import 'default_values.dart';
 /// {@category Database}
 /// {@category Repositories}
 /// {@category Migration}
-class PgDatabase extends Database<PostgreSQLResult> {
+abstract class PgDatabase extends BaseDatabase<PostgreSQLResult> {
   bool debugPrint;
 
   final String host;
@@ -42,13 +42,18 @@ class PgDatabase extends Database<PostgreSQLResult> {
     bool? isUnixSocket,
     this.allowClearTextPassword = false,
     this.replicationMode = ReplicationMode.none,
-  })  : host = host ?? Platform.environment['DB_HOST_ADDRESS'] ?? DB_HOST_ADDRESS,
-        port = port ?? int.tryParse(Platform.environment['DB_PORT'] ?? '') ?? DB_PORT,
+  })  : host =
+            host ?? Platform.environment['DB_HOST_ADDRESS'] ?? DB_HOST_ADDRESS,
+        port = port ??
+            int.tryParse(Platform.environment['DB_PORT'] ?? '') ??
+            DB_PORT,
         database = database ?? Platform.environment['DB_NAME'] ?? DB_NAME,
         user = user ?? Platform.environment['DB_USERNAME'] ?? DB_USERNAME,
-        password = password ?? Platform.environment['DB_PASSWORD'] ?? DB_PASSWORD,
+        password =
+            password ?? Platform.environment['DB_PASSWORD'] ?? DB_PASSWORD,
         useSSL = useSSL ?? (Platform.environment['DB_SSL'] != DB_SSL),
-        isUnixSocket = isUnixSocket ?? (Platform.environment['DB_SOCKET'] == DB_SOCKET);
+        isUnixSocket =
+            isUnixSocket ?? (Platform.environment['DB_SOCKET'] == DB_SOCKET);
 
   PostgreSQLConnection? get connection => _cachedConnection;
 
@@ -96,7 +101,8 @@ class PgDatabase extends Database<PostgreSQLResult> {
   }
 
   @override
-  Future<PostgreSQLResult> query(String query, [Map<String, dynamic>? values]) async {
+  Future<PostgreSQLResult> query(String query,
+      [Map<String, dynamic>? values]) async {
     await _tryOpen();
     if (debugPrint) {
       _printQuery(query);

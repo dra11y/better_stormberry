@@ -1,9 +1,10 @@
 export 'action.dart';
 export 'auto_increment.dart';
+export 'base_database.dart';
 export 'bind_to.dart';
 export 'class_meta.dart';
-export 'database.dart';
 export 'hidden_in.dart';
+export 'magic_database.dart';
 export 'model.dart';
 export 'model_meta.dart';
 export 'primary_key.dart';

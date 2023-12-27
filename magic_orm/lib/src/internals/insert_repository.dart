@@ -12,23 +12,26 @@ abstract class KeyedModelRepositoryInsert<InsertRequest> {
   Future<List<int>> insertMany(List<InsertRequest> requests);
 }
 
-mixin RepositoryInsertMixin<D extends Database, InsertRequest> on BaseRepository<D>
-    implements ModelRepositoryInsert<InsertRequest> {
+mixin RepositoryInsertMixin<D extends BaseDatabase, InsertRequest>
+    on BaseRepository<D> implements ModelRepositoryInsert<InsertRequest> {
   Future<void> insert(List<InsertRequest> requests);
 
   @override
-  Future<void> insertOne(InsertRequest request) => transaction(() => insert([request]));
+  Future<void> insertOne(InsertRequest request) =>
+      transaction(() => insert([request]));
   @override
-  Future<void> insertMany(List<InsertRequest> requests) => transaction(() => insert(requests));
+  Future<void> insertMany(List<InsertRequest> requests) =>
+      transaction(() => insert(requests));
 }
 
-mixin KeyedRepositoryInsertMixin<D extends Database, InsertRequest> on BaseRepository<D>
-    implements KeyedModelRepositoryInsert<InsertRequest> {
+mixin KeyedRepositoryInsertMixin<D extends BaseDatabase, InsertRequest>
+    on BaseRepository<D> implements KeyedModelRepositoryInsert<InsertRequest> {
   Future<List<int>> insert(List<InsertRequest> requests);
 
   @override
   Future<int> insertOne(InsertRequest request) =>
       transaction(() => insert([request])).then((r) => r.first);
   @override
-  Future<List<int>> insertMany(List<InsertRequest> requests) => transaction(() => insert(requests));
+  Future<List<int>> insertMany(List<InsertRequest> requests) =>
+      transaction(() => insert(requests));
 }

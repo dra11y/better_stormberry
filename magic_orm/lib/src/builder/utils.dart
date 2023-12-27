@@ -4,10 +4,11 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:code_builder/code_builder.dart';
 import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 import 'package:source_gen/source_gen.dart';
 
-const tableChecker = TypeChecker.fromRuntime(Model);
+const modelChecker = TypeChecker.fromRuntime(Model);
 const typeConverterChecker = TypeChecker.fromRuntime(TypeConverter);
 const primaryKeyChecker = TypeChecker.fromRuntime(PrimaryKey);
 const autoIncrementChecker = TypeChecker.fromRuntime(AutoIncrement);
@@ -16,7 +17,13 @@ const viewedInChecker = TypeChecker.fromRuntime(ViewedIn);
 const transformedInChecker = TypeChecker.fromRuntime(TransformedIn);
 const useConverterChecker = TypeChecker.fromRuntime(UseConverter);
 const bindToChecker = TypeChecker.fromRuntime(BindTo);
+const databaseChecker = TypeChecker.fromRuntime(MagicDatabase);
 
+Reference referType(Type type) => refer('$type');
+
+extension RelativeUri on Uri {
+  String get relative => pathSegments.sublist(1).join('/');
+}
 
 extension GetNode on Element {
   AstNode? getNode() {
@@ -29,7 +36,8 @@ extension GetNode on Element {
   }
 }
 
-String? getAnnotationCode(Element annotatedElement, Type annotationType, String property) {
+String? getAnnotationCode(
+    Element annotatedElement, Type annotationType, String property) {
   var node = annotatedElement.getNode();
 
   NodeList<Annotation> annotations;
@@ -81,7 +89,8 @@ extension ReaderSource on ConstantReader {
 
     if (isType) {
       return typeValue.getDisplayString(
-          withNullability: typeValue.nullabilitySuffix != NullabilitySuffix.star);
+          withNullability:
+              typeValue.nullabilitySuffix != NullabilitySuffix.star);
     }
 
     var rev = revive();
@@ -93,7 +102,8 @@ extension ReaderSource on ConstantReader {
       if (objectValue.type is InterfaceType) {
         var args = (objectValue.type as InterfaceType).typeArguments;
         if (args.isNotEmpty) {
-          str += '<${args.map((a) => a.getDisplayString(withNullability: true)).join(', ')}>';
+          str +=
+              '<${args.map((a) => a.getDisplayString(withNullability: true)).join(', ')}>';
         }
       }
 
@@ -128,20 +138,24 @@ extension ReaderSource on ConstantReader {
   }
 }
 
-String defineClassWithMeta(String className, ConstantReader? meta, {String? mixin}) {
+String defineClassWithMeta(String className, ConstantReader? meta,
+    {String? mixin}) {
   if (meta == null || meta.isNull) {
     return 'class $className${mixin != null ? ' with $mixin' : ''} {\n';
   }
 
   String readClause(String field, String keyword, [String? additional]) {
     var items = [
-      if (!meta.read(field).isNull) meta.read(field).stringValue.replaceAll('{name}', className),
+      if (!meta.read(field).isNull)
+        meta.read(field).stringValue.replaceAll('{name}', className),
       if (additional != null) additional,
     ];
     return items.isEmpty ? '' : ' $keyword ${items.join(', ')}';
   }
 
-  var annotation = meta.read('annotation').isNull ? '' : '@${meta.read('annotation').toSource()}\n';
+  var annotation = meta.read('annotation').isNull
+      ? ''
+      : '@${meta.read('annotation').toSource()}\n';
   var extendClause = readClause('extend', 'extends');
   var withClause = readClause('mixin', 'with', mixin);
   var implementClause = readClause('implement', 'implements');

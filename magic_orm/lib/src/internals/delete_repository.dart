@@ -8,8 +8,8 @@ abstract class ModelRepositoryDelete<DeleteRequest> {
   Future<void> deleteMany(List<DeleteRequest> ids);
 }
 
-mixin RepositoryDeleteMixin<D extends Database, DeleteRequest> on BaseRepository<D>
-    implements ModelRepositoryDelete<DeleteRequest> {
+mixin RepositoryDeleteMixin<D extends BaseDatabase, DeleteRequest>
+    on BaseRepository<D> implements ModelRepositoryDelete<DeleteRequest> {
   Future<void> delete(List<DeleteRequest> keys) async {
     if (keys.isEmpty) return;
     var values = QueryValues();
@@ -23,5 +23,6 @@ mixin RepositoryDeleteMixin<D extends Database, DeleteRequest> on BaseRepository
   @override
   Future<void> deleteOne(DeleteRequest key) => transaction(() => delete([key]));
   @override
-  Future<void> deleteMany(List<DeleteRequest> keys) => transaction(() => delete(keys));
+  Future<void> deleteMany(List<DeleteRequest> keys) =>
+      transaction(() => delete(keys));
 }

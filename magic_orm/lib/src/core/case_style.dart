@@ -37,7 +37,8 @@ class CaseStyle {
       if (value.startsWith('custom')) {
         var match = customCase.firstMatch(value);
         if (match == null || match.groupCount != 2) {
-          throw FormatException("Cannot parse custom caseStyle expression '$value'");
+          throw FormatException(
+              "Cannot parse custom caseStyle expression '$value'");
         }
 
         TextTransform? head;
@@ -74,16 +75,33 @@ class CaseStyle {
   static const pascalCase = CaseStyle(tail: TextTransform.capitalCase);
 
   /// Transforms to 'field_name'
-  static const snakeCase = CaseStyle(tail: TextTransform.lowerCase, separator: '_');
+  static const snakeCase =
+      CaseStyle(tail: TextTransform.lowerCase, separator: '_');
 
   /// Transforms to 'field-name'
-  static const paramCase = CaseStyle(tail: TextTransform.lowerCase, separator: '-');
+  static const paramCase =
+      CaseStyle(tail: TextTransform.lowerCase, separator: '-');
 
   /// Transforms to 'fieldname'
   static const lowerCase = CaseStyle(tail: TextTransform.lowerCase);
 
   /// Transforms to 'FIELDNAME'
   static const upperCase = CaseStyle(tail: TextTransform.upperCase);
+
+  @override
+  String toString() => switch (this) {
+        CaseStyle.camelCase => 'CaseStyle.camelCase',
+        CaseStyle.lowerCase => 'CaseStyle.lowerCase',
+        CaseStyle.snakeCase => 'CaseStyle.snakeCase',
+        CaseStyle.paramCase => 'CaseStyle.paramCase',
+        CaseStyle.pascalCase => 'CaseStyle.pascalCase',
+        CaseStyle.upperCase => 'CaseStyle.upperCase',
+        _ => '''CaseStyle(
+    head: $head,
+    tail: $tail,
+    separator: $separator,
+  )''',
+      };
 }
 
 extension CaseStyleTransform on CaseStyle? {

@@ -8,12 +8,13 @@ import 'view_query.dart';
 
 typedef Runnable<T> = FutureOr<T> Function();
 
-abstract class ModelRepository<D extends Database> {
+abstract class ModelRepository<D extends BaseDatabase> {
   Future<T> query<T, U>(Query<D, T, U> query, U params);
   Future<void> run<T>(Action<T> action, T request);
 }
 
-abstract class BaseRepository<D extends Database> implements ModelRepository<D> {
+abstract class BaseRepository<D extends BaseDatabase>
+    implements ModelRepository<D> {
   final D db;
 
   final String tableName;
@@ -22,8 +23,9 @@ abstract class BaseRepository<D extends Database> implements ModelRepository<D> 
   BaseRepository(this.db, {required this.tableName, this.keyName});
 
   Future<T?> queryOne<T, K>(K key, KeyedViewQueryable<T, K> q) async {
-    var params =
-        QueryParams(where: '"${q.tableAlias}"."${q.keyName}" = ${q.encodeKey(key)}', limit: 1);
+    var params = QueryParams(
+        where: '"${q.tableAlias}"."${q.keyName}" = ${q.encodeKey(key)}',
+        limit: 1);
     return (await queryMany(q, params)).firstOrNull;
   }
 

@@ -29,7 +29,8 @@ abstract class KeyedViewQueryable<T, K> extends ViewQueryable<T> {
   String encodeKey(K key);
 }
 
-abstract class ViewQuery<D extends Database, Result> implements Query<D, List<Result>, QueryParams> {
+abstract class ViewQuery<D extends BaseDatabase, Result>
+    implements Query<D, List<Result>, QueryParams> {
   ViewQuery(this.queryable);
 
   final ViewQueryable<Result> queryable;
