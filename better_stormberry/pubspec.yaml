@@ -1,8 +1,9 @@
 name: better_stormberry
 description: A strongly-typed postgres ORM to provide easy bindings between your dart classes and postgres database.
-version: 0.13.1
+version: 0.14.0
 repository: https://github.com/dra11y/better_stormberry
 issue_tracker: https://github.com/dra11y/better_stormberry/issues
+publish_to: none
 
 environment:
   sdk: '>3.2.4 <4.0.0'
@@ -10,6 +11,8 @@ environment:
 dependencies:
   analyzer: ^6.3.0
   args: ^2.3.1
+  better_stormberry_annotations:
+    path: ../better_stormberry_annotations
   build: ^2.3.1
   collection: ^1.16.0
   crypto: ^3.0.2
