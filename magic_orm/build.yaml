@@ -1,0 +1,34 @@
+builders:
+  magic_orm:
+    import: "package:magic_orm/builder.dart"
+    builder_factories: [ "analyzeSchema" ]
+    build_extensions: { ".dart": ["___"] }
+    auto_apply: dependents
+    build_to: cache
+    runs_before: [":schema", ":runner"]
+  schema:
+    import: "package:magic_orm/builder.dart"
+    builder_factories: [ "buildSchema" ]
+    build_extensions: { ".dart": [ ".schema.dart" ] }
+    auto_apply: dependents
+    build_to: source
+    runs_before: ["dart_mappable_builder", "freezed", "json_serializable"]
+  runner:
+    import: "package:magic_orm/builder.dart"
+    builder_factories: [ "buildRunner" ]
+    build_extensions: { ".dart": [ ".schema.json" ] }
+    auto_apply: dependents
+    build_to: cache
+
+targets:
+  $default:
+    builders:
+      magic_orm:
+        generate_for:
+          - test/**/*.dart
+      magic_orm|schema:
+        generate_for:
+          - test/**/*.dart
+      magic_orm|runner:
+        generate_for:
+          - test/**/*.dart
