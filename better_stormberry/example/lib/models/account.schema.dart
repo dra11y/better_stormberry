@@ -2,17 +2,17 @@
 
 part of 'account.dart';
 
-extension AccountRepositories on Database {
+extension AccountRepositories on PgDatabase {
   AccountRepository get accounts => AccountRepository._(this);
 }
 
 abstract class AccountRepository
     implements
-        ModelRepository,
+        ModelRepository<PgDatabase>,
         KeyedModelRepositoryInsert<AccountInsertRequest>,
         ModelRepositoryUpdate<AccountUpdateRequest>,
         ModelRepositoryDelete<int> {
-  factory AccountRepository._(Database db) = _AccountRepository;
+  factory AccountRepository._(PgDatabase db) = _AccountRepository;
 
   Future<FullAccountView?> queryFullView(int id);
   Future<List<FullAccountView>> queryFullViews([QueryParams? params]);
@@ -22,13 +22,18 @@ abstract class AccountRepository
   Future<List<CompanyAccountView>> queryCompanyViews([QueryParams? params]);
 }
 
-class _AccountRepository extends BaseRepository
+class _AccountRepository extends BaseRepository<PgDatabase>
     with
-        KeyedRepositoryInsertMixin<AccountInsertRequest>,
-        RepositoryUpdateMixin<AccountUpdateRequest>,
-        RepositoryDeleteMixin<int>
+        KeyedRepositoryInsertMixin<PgDatabase, AccountInsertRequest>,
+        RepositoryUpdateMixin<PgDatabase, AccountUpdateRequest>,
+        RepositoryDeleteMixin<PgDatabase, int>
     implements AccountRepository {
   _AccountRepository(super.db) : super(tableName: 'accounts', keyName: 'id');
+
+  @override
+  Future<List<T>> queryMany<T>(ViewQueryable<T> q, [QueryParams? params]) {
+    return query(PgViewQuery<T>(q), params ?? const QueryParams());
+  }
 
   @override
   Future<FullAccountView?> queryFullView(int id) {
@@ -92,7 +97,7 @@ class _AccountRepository extends BaseRepository
     await db.query(
       'UPDATE "accounts"\n'
       'SET "first_name" = COALESCE(UPDATED."first_name", "accounts"."first_name"), "last_name" = COALESCE(UPDATED."last_name", "accounts"."last_name"), "location" = COALESCE(UPDATED."location", "accounts"."location"), "company_id" = COALESCE(UPDATED."company_id", "accounts"."company_id")\n'
-      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:int8, ${values.add(r.firstName)}:text, ${values.add(r.lastName)}:text, ${values.add(LatLngConverter().tryEncode(r.location))}:point, ${values.add(r.companyId)}:text )').join(', ')} )\n'
+      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:int8::int8, ${values.add(r.firstName)}:text::text, ${values.add(r.lastName)}:text::text, ${values.add(LatLngConverter().tryEncode(r.location))}:point::point, ${values.add(r.companyId)}:text::text )').join(', ')} )\n'
       'AS UPDATED("id", "first_name", "last_name", "location", "company_id")\n'
       'WHERE "accounts"."id" = UPDATED."id"',
       values.values,

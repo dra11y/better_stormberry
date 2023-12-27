@@ -80,7 +80,7 @@ class TableSchema {
   final String name;
   final Map<String, ColumnSchema> columns;
   final List<TableConstraint> constraints;
-  final List<TableIndex> indexes;
+  final List<PgTableIndex> indexes;
 
   const TableSchema(
     this.name, {
@@ -159,7 +159,7 @@ abstract class TableConstraint {
 
 class PrimaryKeyConstraint extends TableConstraint {
   final String column;
-  const PrimaryKeyConstraint(String? name, this.column) : super(name);
+  const PrimaryKeyConstraint(super.name, this.column);
 
   @override
   String toString() {
@@ -185,8 +185,7 @@ class ForeignKeyConstraint extends TableConstraint {
   final ForeignKeyAction onUpdate;
 
   const ForeignKeyConstraint(
-      String? name, this.srcColumn, this.table, this.column, this.onDelete, this.onUpdate)
-      : super(name);
+      super.name, this.srcColumn, this.table, this.column, this.onDelete, this.onUpdate);
 
   @override
   String toString() {
@@ -221,7 +220,7 @@ class ForeignKeyConstraint extends TableConstraint {
 
 class UniqueConstraint extends TableConstraint {
   final String column;
-  const UniqueConstraint(String? name, this.column) : super(name);
+  const UniqueConstraint(super.name, this.column);
 
   @override
   String toString() {
@@ -237,9 +236,9 @@ class UniqueConstraint extends TableConstraint {
   int get hashCode => name.hashCode;
 }
 
-extension TableIndexParser on TableIndex {
-  static TableIndex fromMap(Map<String, dynamic> map) {
-    return TableIndex(
+extension TableIndexParser on PgTableIndex {
+  static PgTableIndex fromMap(Map<String, dynamic> map) {
+    return PgTableIndex(
       name: map['name']! as String,
       columns: (map['columns'] as List?)?.cast<String>() ?? [],
       unique: (map['unique'] as bool?) ?? false,

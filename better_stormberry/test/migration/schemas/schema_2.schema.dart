@@ -2,30 +2,35 @@
 
 part of 'schema_2.dart';
 
-extension Schema2Repositories on Database {
+extension Schema2Repositories on PgDatabase {
   AuthorRepository get authors => AuthorRepository._(this);
   BookRepository get books => BookRepository._(this);
 }
 
 abstract class AuthorRepository
     implements
-        ModelRepository,
+        ModelRepository<PgDatabase>,
         ModelRepositoryInsert<AuthorInsertRequest>,
         ModelRepositoryUpdate<AuthorUpdateRequest>,
         ModelRepositoryDelete<String> {
-  factory AuthorRepository._(Database db) = _AuthorRepository;
+  factory AuthorRepository._(PgDatabase db) = _AuthorRepository;
 
   Future<AuthorView?> queryAuthor(String id);
   Future<List<AuthorView>> queryAuthors([QueryParams? params]);
 }
 
-class _AuthorRepository extends BaseRepository
+class _AuthorRepository extends BaseRepository<PgDatabase>
     with
-        RepositoryInsertMixin<AuthorInsertRequest>,
-        RepositoryUpdateMixin<AuthorUpdateRequest>,
-        RepositoryDeleteMixin<String>
+        RepositoryInsertMixin<PgDatabase, AuthorInsertRequest>,
+        RepositoryUpdateMixin<PgDatabase, AuthorUpdateRequest>,
+        RepositoryDeleteMixin<PgDatabase, String>
     implements AuthorRepository {
   _AuthorRepository(super.db) : super(tableName: 'authors', keyName: 'id');
+
+  @override
+  Future<List<T>> queryMany<T>(ViewQueryable<T> q, [QueryParams? params]) {
+    return query(PgViewQuery<T>(q), params ?? const QueryParams());
+  }
 
   @override
   Future<AuthorView?> queryAuthor(String id) {
@@ -65,23 +70,28 @@ class _AuthorRepository extends BaseRepository
 
 abstract class BookRepository
     implements
-        ModelRepository,
+        ModelRepository<PgDatabase>,
         KeyedModelRepositoryInsert<BookInsertRequest>,
         ModelRepositoryUpdate<BookUpdateRequest>,
         ModelRepositoryDelete<int> {
-  factory BookRepository._(Database db) = _BookRepository;
+  factory BookRepository._(PgDatabase db) = _BookRepository;
 
   Future<BookView?> queryBook(int id);
   Future<List<BookView>> queryBooks([QueryParams? params]);
 }
 
-class _BookRepository extends BaseRepository
+class _BookRepository extends BaseRepository<PgDatabase>
     with
-        KeyedRepositoryInsertMixin<BookInsertRequest>,
-        RepositoryUpdateMixin<BookUpdateRequest>,
-        RepositoryDeleteMixin<int>
+        KeyedRepositoryInsertMixin<PgDatabase, BookInsertRequest>,
+        RepositoryUpdateMixin<PgDatabase, BookUpdateRequest>,
+        RepositoryDeleteMixin<PgDatabase, int>
     implements BookRepository {
   _BookRepository(super.db) : super(tableName: 'books', keyName: 'id');
+
+  @override
+  Future<List<T>> queryMany<T>(ViewQueryable<T> q, [QueryParams? params]) {
+    return query(PgViewQuery<T>(q), params ?? const QueryParams());
+  }
 
   @override
   Future<BookView?> queryBook(int id) {

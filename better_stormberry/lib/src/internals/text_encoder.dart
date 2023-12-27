@@ -1,8 +1,7 @@
 import 'dart:convert';
 
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 import 'package:postgres/postgres.dart';
-
-import '../core/converter.dart';
 
 Type typeOf<T>() => T;
 

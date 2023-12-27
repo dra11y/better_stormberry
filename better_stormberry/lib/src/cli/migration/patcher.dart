@@ -3,7 +3,7 @@ import '../../../better_stormberry.dart';
 import 'differentiator.dart';
 import 'schema.dart';
 
-Future<void> patchSchema(Database db, DatabaseSchemaDiff diff) async {
+Future<void> patchSchema(PgDatabase db, DatabaseSchemaDiff diff) async {
   for (var table in diff.tables.added) {
     await db.query("""
         CREATE TABLE IF NOT EXISTS "${table.name}" (

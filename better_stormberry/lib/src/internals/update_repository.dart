@@ -1,3 +1,5 @@
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
+
 import 'base_repository.dart';
 
 abstract class ModelRepositoryUpdate<UpdateRequest> {
@@ -5,7 +7,7 @@ abstract class ModelRepositoryUpdate<UpdateRequest> {
   Future<void> updateMany(List<UpdateRequest> requests);
 }
 
-mixin RepositoryUpdateMixin<UpdateRequest> on BaseRepository
+mixin RepositoryUpdateMixin<D extends Database, UpdateRequest> on BaseRepository<D>
     implements ModelRepositoryUpdate<UpdateRequest> {
   @override
   Future<void> updateOne(UpdateRequest request) => transaction(() => update([request]));

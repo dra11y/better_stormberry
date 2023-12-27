@@ -105,7 +105,7 @@ class MigrateCommand extends Command<void> {
     var useSSL = resolveProperty<bool>(arg: 'ssl', env: 'DB_SSL');
     var isUnixSocket = resolveProperty<bool>(arg: 'unix-socket', env: 'DB_SOCKET');
 
-    var db = Database(
+    var db = PgDatabase(
       host: dbHost,
       port: dbPort,
       database: dbName,

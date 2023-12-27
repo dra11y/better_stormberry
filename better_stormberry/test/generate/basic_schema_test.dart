@@ -9,7 +9,7 @@ void main() {
 
       setUpAll(() async {
         source = await generateSchema('''
-          import 'package:better_stormberry/better_stormberry.dart';
+          import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
           @Model()
           abstract class A {

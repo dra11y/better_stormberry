@@ -1,3 +1,5 @@
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
+
 import '../core/query_params.dart';
 import 'base_repository.dart';
 
@@ -6,7 +8,7 @@ abstract class ModelRepositoryDelete<DeleteRequest> {
   Future<void> deleteMany(List<DeleteRequest> ids);
 }
 
-mixin RepositoryDeleteMixin<DeleteRequest> on BaseRepository
+mixin RepositoryDeleteMixin<D extends Database, DeleteRequest> on BaseRepository<D>
     implements ModelRepositoryDelete<DeleteRequest> {
   Future<void> delete(List<DeleteRequest> keys) async {
     if (keys.isEmpty) return;

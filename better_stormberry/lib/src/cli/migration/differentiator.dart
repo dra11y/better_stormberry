@@ -4,7 +4,7 @@ import '../../../better_stormberry.dart';
 import 'inspector.dart';
 import 'schema.dart';
 
-Future<DatabaseSchemaDiff> getSchemaDiff(Database db, DatabaseSchema dbSchema) async {
+Future<DatabaseSchemaDiff> getSchemaDiff(PgDatabase db, DatabaseSchema dbSchema) async {
   var existingSchema = await inspectDatabaseSchema(db);
   var newSchema = dbSchema.copy();
 
@@ -136,7 +136,7 @@ class TableSchemaDiff {
   String name;
   Diff<ColumnSchema, Change<ColumnSchema>> columns = Diff();
   Diff<TableConstraint, void> constraints = Diff();
-  Diff<TableIndex, void> indexes = Diff();
+  Diff<PgTableIndex, void> indexes = Diff();
 
   TableSchemaDiff(this.name);
 

@@ -7,7 +7,7 @@ void main() {
   group('analyzing builder', () {
     test('analyzes used converter', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class A {
@@ -45,7 +45,7 @@ void main() {
 
     test('analyzes used converter on nullable field', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class A {
@@ -83,7 +83,7 @@ void main() {
 
     test('analyzes unused converter', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class A {

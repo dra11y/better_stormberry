@@ -2,17 +2,17 @@
 
 part of 'company.dart';
 
-extension CompanyRepositories on Database {
+extension CompanyRepositories on PgDatabase {
   CompanyRepository get companies => CompanyRepository._(this);
 }
 
 abstract class CompanyRepository
     implements
-        ModelRepository,
+        ModelRepository<PgDatabase>,
         ModelRepositoryInsert<CompanyInsertRequest>,
         ModelRepositoryUpdate<CompanyUpdateRequest>,
         ModelRepositoryDelete<String> {
-  factory CompanyRepository._(Database db) = _CompanyRepository;
+  factory CompanyRepository._(PgDatabase db) = _CompanyRepository;
 
   Future<FullCompanyView?> queryFullView(String id);
   Future<List<FullCompanyView>> queryFullViews([QueryParams? params]);
@@ -20,13 +20,18 @@ abstract class CompanyRepository
   Future<List<MemberCompanyView>> queryMemberViews([QueryParams? params]);
 }
 
-class _CompanyRepository extends BaseRepository
+class _CompanyRepository extends BaseRepository<PgDatabase>
     with
-        RepositoryInsertMixin<CompanyInsertRequest>,
-        RepositoryUpdateMixin<CompanyUpdateRequest>,
-        RepositoryDeleteMixin<String>
+        RepositoryInsertMixin<PgDatabase, CompanyInsertRequest>,
+        RepositoryUpdateMixin<PgDatabase, CompanyUpdateRequest>,
+        RepositoryDeleteMixin<PgDatabase, String>
     implements CompanyRepository {
   _CompanyRepository(super.db) : super(tableName: 'companies', keyName: 'id');
+
+  @override
+  Future<List<T>> queryMany<T>(ViewQueryable<T> q, [QueryParams? params]) {
+    return query(PgViewQuery<T>(q), params ?? const QueryParams());
+  }
 
   @override
   Future<FullCompanyView?> queryFullView(String id) {
@@ -76,7 +81,7 @@ class _CompanyRepository extends BaseRepository
     await db.query(
       'UPDATE "companies"\n'
       'SET "name" = COALESCE(UPDATED."name", "companies"."name")\n'
-      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:text, ${values.add(r.name)}:text )').join(', ')} )\n'
+      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:text::text, ${values.add(r.name)}:text::text )').join(', ')} )\n'
       'AS UPDATED("id", "name")\n'
       'WHERE "companies"."id" = UPDATED."id"',
       values.values,

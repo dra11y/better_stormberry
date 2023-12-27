@@ -1,7 +1,7 @@
 import 'package:analyzer/dart/constant/value.dart';
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 import 'package:collection/collection.dart';
 
-import '../../core/annotations.dart';
 import '../../core/case_style.dart';
 import '../utils.dart';
 import 'column/column_element.dart';

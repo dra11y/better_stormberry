@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 import 'package:postgres/postgres.dart';
 
 import 'default_values.dart';
@@ -9,7 +10,7 @@ import 'default_values.dart';
 /// {@category Database}
 /// {@category Repositories}
 /// {@category Migration}
-class Database {
+class PgDatabase extends Database<PostgreSQLResult> {
   bool debugPrint;
 
   final String host;
@@ -27,7 +28,7 @@ class Database {
 
   static PostgreSQLConnection? _cachedConnection;
 
-  Database({
+  PgDatabase({
     this.debugPrint = false,
     String? host,
     int? port,
@@ -68,11 +69,13 @@ class Database {
     );
   }
 
+  @override
   Future<PostgreSQLConnection> open() async {
     await _tryOpen();
     return _cachedConnection!;
   }
 
+  @override
   Future<void> close() async {
     if (_cachedConnection != null && !_cachedConnection!.isClosed) {
       await _cachedConnection!.close();
@@ -92,6 +95,7 @@ class Database {
     print('Database: connected');
   }
 
+  @override
   Future<PostgreSQLResult> query(String query, [Map<String, dynamic>? values]) async {
     await _tryOpen();
     if (debugPrint) {
@@ -123,6 +127,7 @@ class Database {
   Completer<bool>? transactionCompleter;
   PostgreSQLExecutionContext? transactionContext;
 
+  @override
   Future<void> startTransaction() async {
     await _tryOpen();
     if (transactionContext != null) {
@@ -138,6 +143,7 @@ class Database {
     await transactionStarted.future;
   }
 
+  @override
   void cancelTransaction() {
     try {
       transactionContext?.cancelTransaction();
@@ -146,6 +152,7 @@ class Database {
     transactionCompleter = null;
   }
 
+  @override
   Future<bool> finishTransaction() async {
     transactionCompleter?.complete(true);
     transactionContext = null;
@@ -158,6 +165,7 @@ class Database {
     }
   }
 
+  @override
   Future<T> runTransaction<T>(FutureOr<T> Function() run) async {
     if (transactionContext != null) {
       try {

@@ -2,17 +2,17 @@
 
 part of 'party.dart';
 
-extension PartyRepositories on Database {
+extension PartyRepositories on PgDatabase {
   PartyRepository get parties => PartyRepository._(this);
 }
 
 abstract class PartyRepository
     implements
-        ModelRepository,
+        ModelRepository<PgDatabase>,
         ModelRepositoryInsert<PartyInsertRequest>,
         ModelRepositoryUpdate<PartyUpdateRequest>,
         ModelRepositoryDelete<String> {
-  factory PartyRepository._(Database db) = _PartyRepository;
+  factory PartyRepository._(PgDatabase db) = _PartyRepository;
 
   Future<GuestPartyView?> queryGuestView(String id);
   Future<List<GuestPartyView>> queryGuestViews([QueryParams? params]);
@@ -20,13 +20,18 @@ abstract class PartyRepository
   Future<List<CompanyPartyView>> queryCompanyViews([QueryParams? params]);
 }
 
-class _PartyRepository extends BaseRepository
+class _PartyRepository extends BaseRepository<PgDatabase>
     with
-        RepositoryInsertMixin<PartyInsertRequest>,
-        RepositoryUpdateMixin<PartyUpdateRequest>,
-        RepositoryDeleteMixin<String>
+        RepositoryInsertMixin<PgDatabase, PartyInsertRequest>,
+        RepositoryUpdateMixin<PgDatabase, PartyUpdateRequest>,
+        RepositoryDeleteMixin<PgDatabase, String>
     implements PartyRepository {
   _PartyRepository(super.db) : super(tableName: 'parties', keyName: 'id');
+
+  @override
+  Future<List<T>> queryMany<T>(ViewQueryable<T> q, [QueryParams? params]) {
+    return query(PgViewQuery<T>(q), params ?? const QueryParams());
+  }
 
   @override
   Future<GuestPartyView?> queryGuestView(String id) {
@@ -66,7 +71,7 @@ class _PartyRepository extends BaseRepository
     await db.query(
       'UPDATE "parties"\n'
       'SET "name" = COALESCE(UPDATED."name", "parties"."name"), "sponsor_id" = COALESCE(UPDATED."sponsor_id", "parties"."sponsor_id"), "date" = COALESCE(UPDATED."date", "parties"."date")\n'
-      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:text, ${values.add(r.name)}:text, ${values.add(r.sponsorId)}:text, ${values.add(r.date)}:int8 )').join(', ')} )\n'
+      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:text::text, ${values.add(r.name)}:text::text, ${values.add(r.sponsorId)}:text::text, ${values.add(r.date)}:int8::int8 )').join(', ')} )\n'
       'AS UPDATED("id", "name", "sponsor_id", "date")\n'
       'WHERE "parties"."id" = UPDATED."id"',
       values.values,

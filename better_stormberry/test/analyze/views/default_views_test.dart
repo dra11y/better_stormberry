@@ -6,7 +6,7 @@ void main() {
   group('analyzing builder', () {
     test('analyzes one-sided double-keyed implicit default view', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class A {
@@ -64,7 +64,7 @@ void main() {
 
     test('analyzes one-sided double-keyed explicit default view', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model(views: [Model.defaultView])
         abstract class A {
@@ -122,7 +122,7 @@ void main() {
 
     test('analyzes modified default view', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class A {

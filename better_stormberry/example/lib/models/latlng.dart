@@ -1,4 +1,5 @@
-import 'package:better_stormberry/better_stormberry.dart';
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
+import 'package:postgres/postgres.dart';
 
 class LatLng {
   double latitude, longitude;

@@ -1,7 +1,7 @@
 import '../../../better_stormberry.dart';
 import 'schema.dart';
 
-Future<DatabaseSchema> inspectDatabaseSchema(Database db) async {
+Future<DatabaseSchema> inspectDatabaseSchema(PgDatabase db) async {
   //ignore: prefer_const_constructors
   var schema = DatabaseSchema({});
 
@@ -111,7 +111,7 @@ Future<DatabaseSchema> inspectDatabaseSchema(Database db) async {
       condition = condition.substring(1, condition.length - 1);
     }
     var algorithm = IndexAlgorithm.values.firstWhere((a) => a.toString().split('.')[1] == algo);
-    schema.tables[tableName]?.indexes.add(TableIndex(
+    schema.tables[tableName]?.indexes.add(PgTableIndex(
       columns: columns,
       name: indexName,
       algorithm: algorithm,

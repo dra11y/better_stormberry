@@ -6,7 +6,7 @@ void main() {
   group('analyzing builder', () {
     test('analyzes non-modified circular views', () async {
       analyze() => analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class A {

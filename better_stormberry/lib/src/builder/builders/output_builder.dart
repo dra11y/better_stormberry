@@ -3,7 +3,6 @@ import 'package:dart_style/dart_style.dart';
 
 import '../global_options.dart';
 import '../schema.dart';
-import '../utils.dart';
 
 abstract class OutputBuilder implements Builder {
   OutputBuilder(this.ext, BuilderOptions options) : options = GlobalOptions.parse(options.config);

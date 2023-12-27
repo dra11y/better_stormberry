@@ -1,14 +1,16 @@
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
+
 /// Used to define indexes on a table
 ///
 /// {@category Models}
-class TableIndex {
+class PgTableIndex extends TableIndex {
   final List<String> columns;
   final String name;
   final bool unique;
   final IndexAlgorithm algorithm;
   final String? condition;
 
-  const TableIndex({
+  const PgTableIndex({
     required this.name,
     this.columns = const [],
     this.unique = false,
@@ -21,7 +23,7 @@ class TableIndex {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TableIndex &&
+      other is PgTableIndex &&
           runtimeType == other.runtimeType &&
           joinedColumns == other.joinedColumns &&
           name == other.name &&

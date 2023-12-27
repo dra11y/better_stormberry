@@ -1,9 +1,5 @@
-/// {@category Models}
-abstract class Transformer {
-  const Transformer();
 
-  String transform(String column, String table);
-}
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
 abstract class ListTransformer extends Transformer {
   const ListTransformer();
@@ -22,18 +18,6 @@ abstract class ListTransformer extends Transformer {
   }
 }
 
-/// {@category Models}
-class FilterByField extends FilterByValue {
-  final String _value;
-
-  const FilterByField(String key, String operand, this._value) : super(key, operand);
-
-  @override
-  String value(String column, String table) {
-    return '$table.$_value';
-  }
-}
-
 abstract class FilterByValue extends ListTransformer {
   final String key;
   final String operand;
@@ -45,5 +29,17 @@ abstract class FilterByValue extends ListTransformer {
   @override
   String? where(String column, String table) {
     return "($column -> '$key') $operand to_jsonb (${value(column, table)})";
+  }
+}
+
+/// {@category Models}
+class FilterByField extends FilterByValue {
+  final String _value;
+
+  const FilterByField(super.key, super.operand, this._value);
+
+  @override
+  String value(String column, String table) {
+    return '$table.$_value';
   }
 }

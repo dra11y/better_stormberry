@@ -2,30 +2,35 @@
 
 part of 'model.dart';
 
-extension ModelRepositories on Database {
+extension ModelRepositories on PgDatabase {
   ARepository get as => ARepository._(this);
   BRepository get bs => BRepository._(this);
 }
 
 abstract class ARepository
     implements
-        ModelRepository,
+        ModelRepository<PgDatabase>,
         ModelRepositoryInsert<AInsertRequest>,
         ModelRepositoryUpdate<AUpdateRequest>,
         ModelRepositoryDelete<String> {
-  factory ARepository._(Database db) = _ARepository;
+  factory ARepository._(PgDatabase db) = _ARepository;
 
   Future<AView?> queryA(String id);
   Future<List<AView>> queryAs([QueryParams? params]);
 }
 
-class _ARepository extends BaseRepository
+class _ARepository extends BaseRepository<PgDatabase>
     with
-        RepositoryInsertMixin<AInsertRequest>,
-        RepositoryUpdateMixin<AUpdateRequest>,
-        RepositoryDeleteMixin<String>
+        RepositoryInsertMixin<PgDatabase, AInsertRequest>,
+        RepositoryUpdateMixin<PgDatabase, AUpdateRequest>,
+        RepositoryDeleteMixin<PgDatabase, String>
     implements ARepository {
   _ARepository(super.db) : super(tableName: 'as', keyName: 'id');
+
+  @override
+  Future<List<T>> queryMany<T>(ViewQueryable<T> q, [QueryParams? params]) {
+    return query(PgViewQuery<T>(q), params ?? const QueryParams());
+  }
 
   @override
   Future<AView?> queryA(String id) {
@@ -65,23 +70,28 @@ class _ARepository extends BaseRepository
 
 abstract class BRepository
     implements
-        ModelRepository,
+        ModelRepository<PgDatabase>,
         KeyedModelRepositoryInsert<BInsertRequest>,
         ModelRepositoryUpdate<BUpdateRequest>,
         ModelRepositoryDelete<int> {
-  factory BRepository._(Database db) = _BRepository;
+  factory BRepository._(PgDatabase db) = _BRepository;
 
   Future<BView?> queryB(int id);
   Future<List<BView>> queryBs([QueryParams? params]);
 }
 
-class _BRepository extends BaseRepository
+class _BRepository extends BaseRepository<PgDatabase>
     with
-        KeyedRepositoryInsertMixin<BInsertRequest>,
-        RepositoryUpdateMixin<BUpdateRequest>,
-        RepositoryDeleteMixin<int>
+        KeyedRepositoryInsertMixin<PgDatabase, BInsertRequest>,
+        RepositoryUpdateMixin<PgDatabase, BUpdateRequest>,
+        RepositoryDeleteMixin<PgDatabase, int>
     implements BRepository {
   _BRepository(super.db) : super(tableName: 'bs', keyName: 'id');
+
+  @override
+  Future<List<T>> queryMany<T>(ViewQueryable<T> q, [QueryParams? params]) {
+    return query(PgViewQuery<T>(q), params ?? const QueryParams());
+  }
 
   @override
   Future<BView?> queryB(int id) {

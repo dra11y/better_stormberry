@@ -6,7 +6,7 @@ import 'models/company.dart';
 import 'models/latlng.dart';
 
 Future<void> main() async {
-  var db = Database(
+  var db = PgDatabase(
     port: 2222,
     database: 'dart_test',
     user: 'postgres',

@@ -5,14 +5,14 @@ import 'package:better_stormberry/better_stormberry.dart';
 import 'package:test/test.dart';
 
 class StormberryTester {
-  late Database db;
+  late PgDatabase db;
 }
 
 StormberryTester useTester({String? schema, bool cleanup = false}) {
   var tester = StormberryTester();
 
   setUp(() async {
-    tester.db = Database(
+    tester.db = PgDatabase(
         host: 'localhost',
         port: 5432,
         database: 'postgres',
@@ -34,7 +34,7 @@ StormberryTester useTester({String? schema, bool cleanup = false}) {
   return tester;
 }
 
-extension SchemaChanger on Database {
+extension SchemaChanger on PgDatabase {
   Future<DatabaseSchemaDiff> migrateTo(String glob, {bool log = true}) async {
     var schema = await DatabaseSchema.load(
       '.dart_tool/build/generated/better_stormberry/test/$glob.schema.json',

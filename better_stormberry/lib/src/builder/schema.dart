@@ -5,7 +5,6 @@ import 'package:path/path.dart' as p;
 import 'elements/join_table_element.dart';
 import 'elements/table_element.dart';
 import 'global_options.dart';
-import 'utils.dart';
 
 final schemaResource = Resource<SchemaState>(() => SchemaState());
 

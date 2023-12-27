@@ -1,4 +1,5 @@
 import 'package:better_stormberry/better_stormberry.dart';
+import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
 part 'schema_2.schema.dart';
 
@@ -11,7 +12,7 @@ abstract class Author {
 }
 
 @Model(indexes: [
-  TableIndex(name: 'rating_index', columns: ['rating'])
+  PgTableIndex(name: 'rating_index', columns: ['rating'])
 ])
 abstract class Book {
   @AutoIncrement()

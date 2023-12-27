@@ -6,7 +6,7 @@ void main() {
   group('analyzing builder', () {
     test('analyzes simple model', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class MyModel {
@@ -34,7 +34,8 @@ void main() {
 
     test('analyzes field columns', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
+        import 'package:postgres/postgres.dart';
 
         @Model()
         abstract class MyModel {
@@ -128,7 +129,7 @@ void main() {
 
     test('analyzes default view', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class MyModel {

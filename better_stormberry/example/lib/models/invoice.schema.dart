@@ -2,29 +2,34 @@
 
 part of 'invoice.dart';
 
-extension InvoiceRepositories on Database {
+extension InvoiceRepositories on PgDatabase {
   InvoiceRepository get invoices => InvoiceRepository._(this);
 }
 
 abstract class InvoiceRepository
     implements
-        ModelRepository,
+        ModelRepository<PgDatabase>,
         ModelRepositoryInsert<InvoiceInsertRequest>,
         ModelRepositoryUpdate<InvoiceUpdateRequest>,
         ModelRepositoryDelete<String> {
-  factory InvoiceRepository._(Database db) = _InvoiceRepository;
+  factory InvoiceRepository._(PgDatabase db) = _InvoiceRepository;
 
   Future<OwnerInvoiceView?> queryOwnerView(String id);
   Future<List<OwnerInvoiceView>> queryOwnerViews([QueryParams? params]);
 }
 
-class _InvoiceRepository extends BaseRepository
+class _InvoiceRepository extends BaseRepository<PgDatabase>
     with
-        RepositoryInsertMixin<InvoiceInsertRequest>,
-        RepositoryUpdateMixin<InvoiceUpdateRequest>,
-        RepositoryDeleteMixin<String>
+        RepositoryInsertMixin<PgDatabase, InvoiceInsertRequest>,
+        RepositoryUpdateMixin<PgDatabase, InvoiceUpdateRequest>,
+        RepositoryDeleteMixin<PgDatabase, String>
     implements InvoiceRepository {
   _InvoiceRepository(super.db) : super(tableName: 'invoices', keyName: 'id');
+
+  @override
+  Future<List<T>> queryMany<T>(ViewQueryable<T> q, [QueryParams? params]) {
+    return query(PgViewQuery<T>(q), params ?? const QueryParams());
+  }
 
   @override
   Future<OwnerInvoiceView?> queryOwnerView(String id) {
@@ -54,7 +59,7 @@ class _InvoiceRepository extends BaseRepository
     await db.query(
       'UPDATE "invoices"\n'
       'SET "title" = COALESCE(UPDATED."title", "invoices"."title"), "invoice_id" = COALESCE(UPDATED."invoice_id", "invoices"."invoice_id"), "account_id" = COALESCE(UPDATED."account_id", "invoices"."account_id"), "company_id" = COALESCE(UPDATED."company_id", "invoices"."company_id")\n'
-      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:text, ${values.add(r.title)}:text, ${values.add(r.invoiceId)}:text, ${values.add(r.accountId)}:int8, ${values.add(r.companyId)}:text )').join(', ')} )\n'
+      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:text::text, ${values.add(r.title)}:text::text, ${values.add(r.invoiceId)}:text::text, ${values.add(r.accountId)}:int8::int8, ${values.add(r.companyId)}:text::text )').join(', ')} )\n'
       'AS UPDATED("id", "title", "invoice_id", "account_id", "company_id")\n'
       'WHERE "invoices"."id" = UPDATED."id"',
       values.values,

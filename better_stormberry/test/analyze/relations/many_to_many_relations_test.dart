@@ -6,7 +6,7 @@ void main() {
   group('analyzing builder', () {
     test('analyzes two-sided double-keyed many-to-many relation', () async {
       var schema = await analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class A {
@@ -73,7 +73,7 @@ void main() {
 
     test('analyzes two-sided single-keyed many-to-many relation', () async {
       caller() => analyzeSchema('''
-        import 'package:better_stormberry/better_stormberry.dart';
+        import 'package:better_stormberry_annotations/better_stormberry_annotations.dart';
 
         @Model()
         abstract class A {
