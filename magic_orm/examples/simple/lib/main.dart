@@ -2,6 +2,10 @@ import 'package:magic_orm/magic_orm.dart';
 import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 
 import 'models.export.dart';
+import 'models/address.dart';
+import 'models/latlng.dart';
+
+part 'main.schema.dart';
 
 @MagicDatabase(models: models)
 class Database extends PgDatabase {
