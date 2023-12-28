@@ -10,6 +10,8 @@ import 'package:source_gen/source_gen.dart';
 import '../global_options.dart';
 import '../utils.dart';
 
+/// BUILD STEP 1: Generate `List<Type> models` export for all models in shared
+/// project as `models.export.dart` for import into server/client projects.
 class ModelsExporterBuilder extends Builder {
   ModelsExporterBuilder(BuilderOptions options)
       : options = GlobalOptions.parse(options.config);
@@ -31,16 +33,18 @@ class ModelsExporterBuilder extends Builder {
     print('GlobalOptions: $options');
     final schema = await buildStep.fetchResource<ModelState>(modelResource);
 
+    // Loop through all libraries in the project and collect models.
     await for (final input in buildStep.findAssets(Glob('**/*.dart'))) {
       final library = await buildStep.resolver.libraryFor(input);
       try {
-        await analyze(schema, library, buildStep);
+        await collectModels(schema, library, buildStep);
       } catch (e, st) {
-        print('\x1B[31mFailed to analyze database models:\n\n$e\x1B[0m\n');
+        print('\x1B[31mFailed to collect models from $library:\n\n$e\x1B[0m\n');
         print(st);
       }
     }
 
+    // Skip this step if no models in the current project.
     if (schema.models.isEmpty) {
       return;
     }
@@ -50,6 +54,7 @@ class ModelsExporterBuilder extends Builder {
       useNullSafetySyntax: true,
     );
 
+    // Generate a single library file with list of all model types.
     final generated = Library(
       (b) => b
         ..comments.addAll([
@@ -74,19 +79,17 @@ class ModelsExporterBuilder extends Builder {
         ),
     ).accept(emitter).toString();
 
-    final modelExports = DartFormatter().format(generated);
+    final modelExports =
+        DartFormatter(pageWidth: options.lineLength).format(generated);
 
     final assetId = AssetId(buildStep.inputId.package, outputFile);
     buildStep.writeAsString(assetId, modelExports);
   }
 
-  Future<void> analyze(
+  Future<void> collectModels(
       ModelState state, LibraryElement library, BuildStep buildStep) async {
     final reader = LibraryReader(library);
     final models = reader.annotatedWith(modelChecker);
-    for (final model in models) {
-      print('path: ${model.element.librarySource!.uri.pathSegments}');
-    }
     state.models.addAll({
       for (final model in models)
         model.element.librarySource!.uri: model.element as InterfaceElement,
@@ -104,6 +107,7 @@ final modelResource = Resource<ModelState>(() => ModelState());
 class ModelState {
   final Map<Uri, InterfaceElement> models = {};
 
+  // Get a list of model type refs with relative Uris.
   Iterable<Reference> get refs =>
       models.entries.map((m) => refer(m.value.name, m.key.relative));
 }
