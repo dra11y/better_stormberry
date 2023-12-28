@@ -1,4 +1,3 @@
-
 import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 
 abstract class ListTransformer extends Transformer {

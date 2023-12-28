@@ -113,7 +113,9 @@ class _BookRepository extends BaseRepository<PgDatabase>
       'RETURNING "id"',
       values.values,
     );
-    var result = rows.map<int>((r) => TextEncoder.i.decode(r.toColumnMap()['id'])).toList();
+    var result = rows
+        .map<int>((r) => TextEncoder.i.decode(r.toColumnMap()['id']))
+        .toList();
 
     return result;
   }
@@ -194,7 +196,8 @@ class AuthorViewQueryable extends KeyedViewQueryable<AuthorView, String> {
   String get tableAlias => 'authors';
 
   @override
-  AuthorView decode(TypedMap map) => AuthorView(id: map.get('id'), name: map.get('name'));
+  AuthorView decode(TypedMap map) =>
+      AuthorView(id: map.get('id'), name: map.get('name'));
 }
 
 class AuthorView {

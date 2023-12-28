@@ -8,4 +8,3 @@ class UseConverter {
 
   const UseConverter(this.converter);
 }
-

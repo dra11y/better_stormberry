@@ -26,8 +26,8 @@ mixin RelationalColumnElement implements ColumnElement {
 
   @override
   void checkModifiers() {
-    var groupedModifiers = modifiers.groupListsBy(
-        (m) => Object.hash(m.read('name').objectValue.toSymbolValue(), m.objectValue.type));
+    var groupedModifiers = modifiers.groupListsBy((m) => Object.hash(
+        m.read('name').objectValue.toSymbolValue(), m.objectValue.type));
     if (groupedModifiers.values.any((l) => l.length > 1)) {
       var duplicated = groupedModifiers.values.where((l) => l.length > 1).first;
       throw 'Column field was annotated with duplicate view modifiers, which is not supported.\n'
@@ -41,7 +41,8 @@ mixin LinkedColumnElement implements ColumnElement {
   TableElement get linkedTable;
 }
 
-mixin ReferencingColumnElement implements LinkedColumnElement, ParameterColumnElement {
+mixin ReferencingColumnElement
+    implements LinkedColumnElement, ParameterColumnElement {
   ReferencingColumnElement get referencedColumn;
   set referencedColumn(ReferencingColumnElement c);
 }
@@ -75,19 +76,23 @@ abstract class ColumnElement {
         .map((annotation) => annotation.getField('converter'))
         .whereType<DartObject>()
         .firstWhereOrNull((converter) {
-          final type = converter.type;
-          if (type is InterfaceType) {
-            final allTypes = [...type.typeArguments, ...type.allSupertypes.expand((t) => t.typeArguments)];
-            return allTypes.any((t) => paramTypeChecker.isAssignableFromType(t));
-          }
-          return false;
-        });
+      final type = converter.type;
+      if (type is InterfaceType) {
+        final allTypes = [
+          ...type.typeArguments,
+          ...type.allSupertypes.expand((t) => t.typeArguments)
+        ];
+        return allTypes.any((t) => paramTypeChecker.isAssignableFromType(t));
+      }
+      return false;
+    });
   }();
 
   void checkConverter();
 
   late List<ConstantReader> modifiers = () {
-    if (parameter == null || parameter!.getter == null) return <ConstantReader>[];
+    if (parameter == null || parameter!.getter == null)
+      return <ConstantReader>[];
 
     return [
       ...hiddenInChecker.annotationsOf(parameter!),

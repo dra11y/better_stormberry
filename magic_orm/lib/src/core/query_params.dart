@@ -6,7 +6,8 @@ class QueryParams {
   final int? offset;
   final Map<String, dynamic>? values;
 
-  const QueryParams({this.where, this.orderBy, this.limit, this.offset, this.values});
+  const QueryParams(
+      {this.where, this.orderBy, this.limit, this.offset, this.values});
 }
 
 class QueryValues {

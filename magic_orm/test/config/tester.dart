@@ -17,7 +17,8 @@ StormberryTester useTester({String? schema, bool cleanup = false}) {
         port: 5432,
         database: 'postgres',
         user: 'postgres',
-        password: 'postgres', debugPrint: false);
+        password: 'postgres',
+        debugPrint: false);
     if (schema != null) {
       await tester.db.migrateTo(schema);
     }

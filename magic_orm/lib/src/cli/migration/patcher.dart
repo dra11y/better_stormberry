@@ -71,8 +71,9 @@ Future<void> patchSchema(PgDatabase db, DatabaseSchemaDiff diff) async {
   }
 
   for (var table in diff.tables.added) {
-    var uniqueConstraints =
-        table.constraints.where((c) => c is PrimaryKeyConstraint || c is UniqueConstraint).toList();
+    var uniqueConstraints = table.constraints
+        .where((c) => c is PrimaryKeyConstraint || c is UniqueConstraint)
+        .toList();
     if (uniqueConstraints.isNotEmpty) {
       await db.query("""
           ALTER TABLE "${table.name}"
@@ -82,7 +83,8 @@ Future<void> patchSchema(PgDatabase db, DatabaseSchemaDiff diff) async {
   }
 
   for (var table in diff.tables.modified) {
-    var foreignKeyConstraints = table.constraints.added.whereType<ForeignKeyConstraint>().toList();
+    var foreignKeyConstraints =
+        table.constraints.added.whereType<ForeignKeyConstraint>().toList();
     if (foreignKeyConstraints.isNotEmpty) {
       await db.query("""
           ALTER TABLE "${table.name}"
@@ -92,7 +94,8 @@ Future<void> patchSchema(PgDatabase db, DatabaseSchemaDiff diff) async {
   }
 
   for (var table in diff.tables.added) {
-    var foreignKeyConstraints = table.constraints.whereType<ForeignKeyConstraint>().toList();
+    var foreignKeyConstraints =
+        table.constraints.whereType<ForeignKeyConstraint>().toList();
     if (foreignKeyConstraints.isNotEmpty) {
       await db.query("""
           ALTER TABLE "${table.name}"

@@ -7,12 +7,16 @@ Type typeOf<T>() => T;
 
 final _baseConverters = <Type, TypeConverter>{
   typeOf<dynamic>(): _PrimitiveTypeConverter((dynamic v) => v),
-  typeOf<String>(): _PrimitiveTypeConverter<String>((dynamic v) => v.toString()),
-  typeOf<int>(): _PrimitiveTypeConverter<int>((dynamic v) => num.parse(v.toString()).round()),
-  typeOf<double>(): _PrimitiveTypeConverter<double>((dynamic v) => double.parse(v.toString())),
-  typeOf<num>(): _PrimitiveTypeConverter<num>((dynamic v) => num.parse(v.toString())),
-  typeOf<bool>():
-      _PrimitiveTypeConverter<bool>((dynamic v) => v is num ? v != 0 : v.toString() == 'true'),
+  typeOf<String>():
+      _PrimitiveTypeConverter<String>((dynamic v) => v.toString()),
+  typeOf<int>(): _PrimitiveTypeConverter<int>(
+      (dynamic v) => num.parse(v.toString()).round()),
+  typeOf<double>(): _PrimitiveTypeConverter<double>(
+      (dynamic v) => double.parse(v.toString())),
+  typeOf<num>():
+      _PrimitiveTypeConverter<num>((dynamic v) => num.parse(v.toString())),
+  typeOf<bool>(): _PrimitiveTypeConverter<bool>(
+      (dynamic v) => v is num ? v != 0 : v.toString() == 'true'),
   typeOf<DateTime>(): _DateTimeConverter(),
 };
 
@@ -136,7 +140,9 @@ class TypedMap {
       throw ConverterException('Parameter $key is not a List');
     }
     List value = map[key] as List<dynamic>;
-    return value.map((dynamic item) => (decode ?? TextEncoder.i.decode<T>)(item)).toList();
+    return value
+        .map((dynamic item) => (decode ?? TextEncoder.i.decode<T>)(item))
+        .toList();
   }
 
   List<T>? getListOpt<T>(String key, [Decoder<T>? decode]) {
@@ -150,7 +156,8 @@ class TypedMap {
     if (map[key] == null) {
       throw ConverterException('Parameter $key is required.');
     } else if (map[key] is! Map) {
-      throw ConverterException('Parameter ${map[key]} with key $key is not a Map');
+      throw ConverterException(
+          'Parameter ${map[key]} with key $key is not a Map');
     }
     Map value = map[key] as Map<dynamic, dynamic>;
     return (decode ?? TextEncoder.i.decode)(value);
@@ -224,7 +231,8 @@ class _TextEncoder {
     return value ? 'TRUE' : 'FALSE';
   }
 
-  String _encodeDateTime(DateTime value, QuoteStyle quotes, {bool isDateOnly = false}) {
+  String _encodeDateTime(DateTime value, QuoteStyle quotes,
+      {bool isDateOnly = false}) {
     var string = value.toIso8601String();
 
     if (isDateOnly) {
@@ -235,7 +243,8 @@ class _TextEncoder {
         final timezoneMinuteOffset = value.timeZoneOffset.inMinutes % 60;
 
         var hourComponent = timezoneHourOffset.abs().toString().padLeft(2, '0');
-        final minuteComponent = timezoneMinuteOffset.abs().toString().padLeft(2, '0');
+        final minuteComponent =
+            timezoneMinuteOffset.abs().toString().padLeft(2, '0');
 
         if (timezoneHourOffset >= 0) {
           hourComponent = '+$hourComponent';
@@ -263,7 +272,8 @@ class _TextEncoder {
 
   String _encodePoint(PgPoint value, QuoteStyle quotes) {
     return _encodeString(
-        '(${_encodeNumber(value.latitude)},${_encodeNumber(value.longitude)})', quotes);
+        '(${_encodeNumber(value.latitude)},${_encodeNumber(value.longitude)})',
+        quotes);
   }
 
   String _sharedType(List values) {
@@ -290,7 +300,8 @@ class _TextEncoder {
     late Iterable<String> encoded;
 
     if (type == 'string') {
-      encoded = value.map((s) => _encodeString(s.toString(), QuoteStyle.double));
+      encoded =
+          value.map((s) => _encodeString(s.toString(), QuoteStyle.double));
     } else if (type == 'int' || type == 'double' || type == 'num') {
       encoded = value.map((s) => _encodeNumber(s as num, asInt: type == 'int'));
     } else {

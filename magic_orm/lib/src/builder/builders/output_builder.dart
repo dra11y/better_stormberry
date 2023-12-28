@@ -5,7 +5,8 @@ import '../global_options.dart';
 import '../schema.dart';
 
 abstract class OutputBuilder implements Builder {
-  OutputBuilder(this.ext, BuilderOptions options) : options = GlobalOptions.parse(options.config);
+  OutputBuilder(this.ext, BuilderOptions options)
+      : options = GlobalOptions.parse(options.config);
 
   final String ext;
   final GlobalOptions options;
@@ -31,7 +32,8 @@ abstract class OutputBuilder implements Builder {
           output = formatter.format(output);
         }
 
-        await buildStep.writeAsString(buildStep.inputId.changeExtension('.schema.$ext'), output);
+        await buildStep.writeAsString(
+            buildStep.inputId.changeExtension('.schema.$ext'), output);
       }
     } catch (e, st) {
       print('\x1B[31mFailed to build database schema:\n\n$e\x1B[0m\n');

@@ -10,5 +10,6 @@ class TransformedIn {
   final Transformer by;
 
   const TransformedIn(this.name, {required this.by});
-  const TransformedIn.defaultView({required this.by}) : name = Model.defaultView;
+  const TransformedIn.defaultView({required this.by})
+      : name = Model.defaultView;
 }

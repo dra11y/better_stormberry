@@ -4,7 +4,8 @@ import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 import 'text_encoder.dart';
 import 'view_query.dart';
 
-class PgViewQuery<Result> extends ViewQuery<PgDatabase, Result> implements Query<PgDatabase, List<Result>, QueryParams> {
+class PgViewQuery<Result> extends ViewQuery<PgDatabase, Result>
+    implements Query<PgDatabase, List<Result>, QueryParams> {
   PgViewQuery(super.queryable);
 
   @override
@@ -18,8 +19,11 @@ class PgViewQuery<Result> extends ViewQuery<PgDatabase, Result> implements Query
       ${params.offset != null ? "OFFSET ${params.offset}" : ""}
     """, params.values);
 
-    var results = res.map((row) => queryable.decode(TypedMap(row.toColumnMap()))).toList();
-    print('Queried ${results.length} rows in ${DateTime.now().difference(time)}');
+    var results = res
+        .map((row) => queryable.decode(TypedMap(row.toColumnMap())))
+        .toList();
+    print(
+        'Queried ${results.length} rows in ${DateTime.now().difference(time)}');
     return results;
   }
 }
