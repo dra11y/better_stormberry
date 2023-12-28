@@ -5,8 +5,7 @@ part of 'main.dart';
 extension MainRepositories on PgDatabase {
   InvoiceRepository get invoices => InvoiceRepository._(this);
   PartyRepository get parties => PartyRepository._(this);
-  BillingAddressRepository get billingAddresses =>
-      BillingAddressRepository._(this);
+  BillingAddressRepository get billingAddresses => BillingAddressRepository._(this);
   AccountRepository get accounts => AccountRepository._(this);
   CompanyRepository get companies => CompanyRepository._(this);
 }
@@ -168,8 +167,7 @@ class _BillingAddressRepository extends BaseRepository<PgDatabase>
   }
 
   @override
-  Future<List<BillingAddressView>> queryBillingAddresses(
-      [QueryParams? params]) {
+  Future<List<BillingAddressView>> queryBillingAddresses([QueryParams? params]) {
     return queryMany(BillingAddressViewQueryable(), params);
   }
 
@@ -178,8 +176,8 @@ class _BillingAddressRepository extends BaseRepository<PgDatabase>
     if (requests.isEmpty) return;
     var values = QueryValues();
     await db.query(
-      'INSERT INTO "billing_addresses" ( "city", "postcode", "name", "street", "name", "street", "account_id", "company_id" )\n'
-      'VALUES ${requests.map((r) => '( ${values.add(r.city)}:text, ${values.add(r.postcode)}:text, ${values.add(r.name)}:text, ${values.add(r.street)}:text, ${values.add(r.name)}:text, ${values.add(r.street)}:text, ${values.add(r.accountId)}:int8, ${values.add(r.companyId)}:text )').join(', ')}\n',
+      'INSERT INTO "billing_addresses" ( "city", "postcode", "name", "street", "account_id", "company_id" )\n'
+      'VALUES ${requests.map((r) => '( ${values.add(r.city)}:text, ${values.add(r.postcode)}:text, ${values.add(r.name)}:text, ${values.add(r.street)}:text, ${values.add(r.accountId)}:int8, ${values.add(r.companyId)}:text )').join(', ')}\n',
       values.values,
     );
   }
@@ -190,9 +188,9 @@ class _BillingAddressRepository extends BaseRepository<PgDatabase>
     var values = QueryValues();
     await db.query(
       'UPDATE "billing_addresses"\n'
-      'SET "city" = COALESCE(UPDATED."city", "billing_addresses"."city"), "postcode" = COALESCE(UPDATED."postcode", "billing_addresses"."postcode"), "name" = COALESCE(UPDATED."name", "billing_addresses"."name"), "street" = COALESCE(UPDATED."street", "billing_addresses"."street"), "name" = COALESCE(UPDATED."name", "billing_addresses"."name"), "street" = COALESCE(UPDATED."street", "billing_addresses"."street")\n'
-      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.city)}:text::text, ${values.add(r.postcode)}:text::text, ${values.add(r.name)}:text::text, ${values.add(r.street)}:text::text, ${values.add(r.name)}:text::text, ${values.add(r.street)}:text::text, ${values.add(r.accountId)}:int8::int8, ${values.add(r.companyId)}:text::text )').join(', ')} )\n'
-      'AS UPDATED("city", "postcode", "name", "street", "name", "street", "account_id", "company_id")\n'
+      'SET "city" = COALESCE(UPDATED."city", "billing_addresses"."city"), "postcode" = COALESCE(UPDATED."postcode", "billing_addresses"."postcode"), "name" = COALESCE(UPDATED."name", "billing_addresses"."name"), "street" = COALESCE(UPDATED."street", "billing_addresses"."street")\n'
+      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.city)}:text::text, ${values.add(r.postcode)}:text::text, ${values.add(r.name)}:text::text, ${values.add(r.street)}:text::text, ${values.add(r.accountId)}:int8::int8, ${values.add(r.companyId)}:text::text )').join(', ')} )\n'
+      'AS UPDATED("city", "postcode", "name", "street", "account_id", "company_id")\n'
       'WHERE "billing_addresses"."account_id" = UPDATED."account_id" AND "billing_addresses"."company_id" = UPDATED."company_id"',
       values.values,
     );
@@ -268,17 +266,12 @@ class _AccountRepository extends BaseRepository<PgDatabase>
       'RETURNING "id"',
       values.values,
     );
-    var result = rows
-        .map<int>((r) => TextEncoder.i.decode(r.toColumnMap()['id']))
-        .toList();
+    var result = rows.map<int>((r) => TextEncoder.i.decode(r.toColumnMap()['id'])).toList();
 
-    await db.billingAddresses
-        .insertMany(requests.where((r) => r.billingAddress != null).map((r) {
+    await db.billingAddresses.insertMany(requests.where((r) => r.billingAddress != null).map((r) {
       return BillingAddressInsertRequest(
           city: r.billingAddress!.city,
           postcode: r.billingAddress!.postcode,
-          name: r.billingAddress!.name,
-          street: r.billingAddress!.street,
           name: r.billingAddress!.name,
           street: r.billingAddress!.street,
           accountId: result[requests.indexOf(r)],
@@ -300,13 +293,10 @@ class _AccountRepository extends BaseRepository<PgDatabase>
       'WHERE "accounts"."id" = UPDATED."id"',
       values.values,
     );
-    await db.billingAddresses
-        .updateMany(requests.where((r) => r.billingAddress != null).map((r) {
+    await db.billingAddresses.updateMany(requests.where((r) => r.billingAddress != null).map((r) {
       return BillingAddressUpdateRequest(
           city: r.billingAddress!.city,
           postcode: r.billingAddress!.postcode,
-          name: r.billingAddress!.name,
-          street: r.billingAddress!.street,
           name: r.billingAddress!.name,
           street: r.billingAddress!.street,
           accountId: r.id);
@@ -377,8 +367,6 @@ class _CompanyRepository extends BaseRepository<PgDatabase>
           postcode: rr.postcode,
           name: rr.name,
           street: rr.street,
-          name: rr.name,
-          street: rr.street,
           accountId: null,
           companyId: r.id));
     }).toList());
@@ -396,16 +384,9 @@ class _CompanyRepository extends BaseRepository<PgDatabase>
       'WHERE "companies"."id" = UPDATED."id"',
       values.values,
     );
-    await db.billingAddresses
-        .updateMany(requests.where((r) => r.addresses != null).expand((r) {
+    await db.billingAddresses.updateMany(requests.where((r) => r.addresses != null).expand((r) {
       return r.addresses!.map((rr) => BillingAddressUpdateRequest(
-          city: rr.city,
-          postcode: rr.postcode,
-          name: rr.name,
-          street: rr.street,
-          name: rr.name,
-          street: rr.street,
-          companyId: r.id));
+          city: rr.city, postcode: rr.postcode, name: rr.name, street: rr.street, companyId: r.id));
     }).toList());
   }
 }
@@ -446,16 +427,12 @@ class BillingAddressInsertRequest {
     required this.postcode,
     required this.name,
     required this.street,
-    required this.name,
-    required this.street,
     this.accountId,
     this.companyId,
   });
 
   final String city;
   final String postcode;
-  final String name;
-  final String street;
   final String name;
   final String street;
   final int? accountId;
@@ -526,16 +503,12 @@ class BillingAddressUpdateRequest {
     this.postcode,
     this.name,
     this.street,
-    this.name,
-    this.street,
     this.accountId,
     this.companyId,
   });
 
   final String? city;
   final String? postcode;
-  final String? name;
-  final String? street;
   final String? name;
   final String? street;
   final int? accountId;
@@ -572,8 +545,7 @@ class CompanyUpdateRequest {
   final List<BillingAddress>? addresses;
 }
 
-class OwnerInvoiceViewQueryable
-    extends KeyedViewQueryable<OwnerInvoiceView, String> {
+class OwnerInvoiceViewQueryable extends KeyedViewQueryable<OwnerInvoiceView, String> {
   @override
   String get keyName => 'id';
 
@@ -589,9 +561,7 @@ class OwnerInvoiceViewQueryable
 
   @override
   OwnerInvoiceView decode(TypedMap map) => OwnerInvoiceView(
-      id: map.get('id'),
-      title: map.get('title'),
-      invoiceId: map.get('invoice_id'));
+      id: map.get('id'), title: map.get('title'), invoiceId: map.get('invoice_id'));
 }
 
 class OwnerInvoiceView {
@@ -606,8 +576,7 @@ class OwnerInvoiceView {
   final String invoiceId;
 }
 
-class GuestPartyViewQueryable
-    extends KeyedViewQueryable<GuestPartyView, String> {
+class GuestPartyViewQueryable extends KeyedViewQueryable<GuestPartyView, String> {
   @override
   String get keyName => 'id';
 
@@ -615,8 +584,7 @@ class GuestPartyViewQueryable
   String encodeKey(String key) => TextEncoder.i.encode(key);
 
   @override
-  String get query =>
-      'SELECT "parties".*, row_to_json("sponsor".*) as "sponsor"'
+  String get query => 'SELECT "parties".*, row_to_json("sponsor".*) as "sponsor"'
       'FROM "parties"'
       'LEFT JOIN (${MemberCompanyViewQueryable().query}) "sponsor"'
       'ON "parties"."sponsor_id" = "sponsor"."id"';
@@ -646,8 +614,7 @@ class GuestPartyView {
   final int date;
 }
 
-class CompanyPartyViewQueryable
-    extends KeyedViewQueryable<CompanyPartyView, String> {
+class CompanyPartyViewQueryable extends KeyedViewQueryable<CompanyPartyView, String> {
   @override
   String get keyName => 'id';
 
@@ -662,8 +629,8 @@ class CompanyPartyViewQueryable
   String get tableAlias => 'parties';
 
   @override
-  CompanyPartyView decode(TypedMap map) => CompanyPartyView(
-      id: map.get('id'), name: map.get('name'), date: map.get('date'));
+  CompanyPartyView decode(TypedMap map) =>
+      CompanyPartyView(id: map.get('id'), name: map.get('name'), date: map.get('date'));
 }
 
 class CompanyPartyView {
@@ -691,8 +658,6 @@ class BillingAddressViewQueryable extends ViewQueryable<BillingAddressView> {
       city: map.get('city'),
       postcode: map.get('postcode'),
       name: map.get('name'),
-      street: map.get('street'),
-      name: map.get('name'),
       street: map.get('street'));
 }
 
@@ -702,20 +667,15 @@ class BillingAddressView implements BillingAddress {
     required this.postcode,
     required this.name,
     required this.street,
-    required this.name,
-    required this.street,
   });
 
   final String city;
   final String postcode;
   final String name;
   final String street;
-  final String name;
-  final String street;
 }
 
-class FullAccountViewQueryable
-    extends KeyedViewQueryable<FullAccountView, int> {
+class FullAccountViewQueryable extends KeyedViewQueryable<FullAccountView, int> {
   @override
   String get keyName => 'id';
 
@@ -756,14 +716,10 @@ class FullAccountViewQueryable
       firstName: map.get('first_name'),
       lastName: map.get('last_name'),
       location: map.get('location', LatLngConverter().decode),
-      billingAddress:
-          map.getOpt('billingAddress', BillingAddressViewQueryable().decoder),
-      invoices:
-          map.getListOpt('invoices', OwnerInvoiceViewQueryable().decoder) ??
-              const [],
+      billingAddress: map.getOpt('billingAddress', BillingAddressViewQueryable().decoder),
+      invoices: map.getListOpt('invoices', OwnerInvoiceViewQueryable().decoder) ?? const [],
       company: map.getOpt('company', MemberCompanyViewQueryable().decoder),
-      parties: map.getListOpt('parties', GuestPartyViewQueryable().decoder) ??
-          const []);
+      parties: map.getListOpt('parties', GuestPartyViewQueryable().decoder) ?? const []);
 }
 
 class FullAccountView {
@@ -788,8 +744,7 @@ class FullAccountView {
   final List<GuestPartyView> parties;
 }
 
-class UserAccountViewQueryable
-    extends KeyedViewQueryable<UserAccountView, int> {
+class UserAccountViewQueryable extends KeyedViewQueryable<UserAccountView, int> {
   @override
   String get keyName => 'id';
 
@@ -830,14 +785,10 @@ class UserAccountViewQueryable
       firstName: map.get('first_name'),
       lastName: map.get('last_name'),
       location: map.get('location', LatLngConverter().decode),
-      billingAddress:
-          map.getOpt('billingAddress', BillingAddressViewQueryable().decoder),
-      invoices:
-          map.getListOpt('invoices', OwnerInvoiceViewQueryable().decoder) ??
-              const [],
+      billingAddress: map.getOpt('billingAddress', BillingAddressViewQueryable().decoder),
+      invoices: map.getListOpt('invoices', OwnerInvoiceViewQueryable().decoder) ?? const [],
       company: map.getOpt('company', MemberCompanyViewQueryable().decoder),
-      parties: map.getListOpt('parties', GuestPartyViewQueryable().decoder) ??
-          const []);
+      parties: map.getListOpt('parties', GuestPartyViewQueryable().decoder) ?? const []);
 }
 
 class UserAccountView {
@@ -862,8 +813,7 @@ class UserAccountView {
   final List<GuestPartyView> parties;
 }
 
-class CompanyAccountViewQueryable
-    extends KeyedViewQueryable<CompanyAccountView, int> {
+class CompanyAccountViewQueryable extends KeyedViewQueryable<CompanyAccountView, int> {
   @override
   String get keyName => 'id';
 
@@ -893,8 +843,7 @@ class CompanyAccountViewQueryable
       firstName: map.get('first_name'),
       lastName: map.get('last_name'),
       location: map.get('location', LatLngConverter().decode),
-      parties: map.getListOpt('parties', CompanyPartyViewQueryable().decoder) ??
-          const []);
+      parties: map.getListOpt('parties', CompanyPartyViewQueryable().decoder) ?? const []);
 }
 
 class CompanyAccountView {
@@ -913,8 +862,7 @@ class CompanyAccountView {
   final List<CompanyPartyView> parties;
 }
 
-class FullCompanyViewQueryable
-    extends KeyedViewQueryable<FullCompanyView, String> {
+class FullCompanyViewQueryable extends KeyedViewQueryable<FullCompanyView, String> {
   @override
   String get keyName => 'id';
 
@@ -961,17 +909,10 @@ class FullCompanyViewQueryable
   FullCompanyView decode(TypedMap map) => FullCompanyView(
       id: map.get('id'),
       name: map.get('name'),
-      addresses:
-          map.getListOpt('addresses', BillingAddressViewQueryable().decoder) ??
-              const [],
-      members:
-          map.getListOpt('members', CompanyAccountViewQueryable().decoder) ??
-              const [],
-      invoices:
-          map.getListOpt('invoices', OwnerInvoiceViewQueryable().decoder) ??
-              const [],
-      parties: map.getListOpt('parties', CompanyPartyViewQueryable().decoder) ??
-          const []);
+      addresses: map.getListOpt('addresses', BillingAddressViewQueryable().decoder) ?? const [],
+      members: map.getListOpt('members', CompanyAccountViewQueryable().decoder) ?? const [],
+      invoices: map.getListOpt('invoices', OwnerInvoiceViewQueryable().decoder) ?? const [],
+      parties: map.getListOpt('parties', CompanyPartyViewQueryable().decoder) ?? const []);
 }
 
 class FullCompanyView {
@@ -992,8 +933,7 @@ class FullCompanyView {
   final List<CompanyPartyView> parties;
 }
 
-class MemberCompanyViewQueryable
-    extends KeyedViewQueryable<MemberCompanyView, String> {
+class MemberCompanyViewQueryable extends KeyedViewQueryable<MemberCompanyView, String> {
   @override
   String get keyName => 'id';
 
@@ -1018,9 +958,7 @@ class MemberCompanyViewQueryable
   MemberCompanyView decode(TypedMap map) => MemberCompanyView(
       id: map.get('id'),
       name: map.get('name'),
-      addresses:
-          map.getListOpt('addresses', BillingAddressViewQueryable().decoder) ??
-              const []);
+      addresses: map.getListOpt('addresses', BillingAddressViewQueryable().decoder) ?? const []);
 }
 
 class MemberCompanyView {

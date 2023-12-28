@@ -65,4 +65,15 @@ class ViewColumnElement {
 
   late bool isNullable =
       column.parameter!.type.nullabilitySuffix == NullabilitySuffix.question;
+
+  @override
+  String toString() => '''ViewColumnElement(
+    viewAs: $viewAs,
+    transformer: $transformer,
+    column: $column,
+    isNullable: $isNullable,
+    view: $view,
+    paramName: $paramName,
+    dartType: $dartType,
+  )''';
 }

@@ -25,6 +25,7 @@ class TableElement {
   final ConstantReader annotation;
   final BuilderState state;
 
+  late bool isAbstract;
   late String repoName;
   late String tableName;
   late FieldElement? primaryKeyParameter;
@@ -35,6 +36,7 @@ class TableElement {
   TableElement(this.element, this.annotation, this.state) {
     tableName = _getTableName();
     repoName = _getRepoName();
+    isAbstract = element.isAbstract;
 
     primaryKeyParameter = element.fields
         .where((p) =>
@@ -44,8 +46,8 @@ class TableElement {
 
     views = {};
 
-    for (var o in annotation.read('views').listValue) {
-      var name = ViewElement.nameOf(o);
+    for (final o in annotation.read('views').listValue) {
+      final name = ViewElement.nameOf(o);
       views[name] = ViewElement(this, name);
     }
 
@@ -72,7 +74,7 @@ class TableElement {
   }
 
   String _getRepoName({bool singular = false}) {
-    var name = element.name;
+    String name = element.name;
     if (!singular) {
       if (element.name.endsWith('s')) {
         name += 'es';
@@ -94,32 +96,45 @@ class TableElement {
           .firstOrNull
       : null;
 
-  late List<FieldElement> allFields = element.fields
-      .cast<FieldElement>()
-      .followedBy(element.allSupertypes
-          .expand((t) => t.isDartCoreObject ? [] : t.element.fields))
-      .toList();
+  late List<FieldElement> allFields = () {
+    // Only include overridden fields once, otherwise we get duplicates!
+    final List<String> overriddenNames =
+        element.fields.map((f) => f.name).toList();
+    return element.fields
+        .cast<FieldElement>()
+        .followedBy(
+          element.allSupertypes.whereNot(
+                  // Do not include fields of Dart core supertypes.
+                  (t) => t.isDartCoreObject).expand(
+                (t) => t.element.fields.whereNot(
+                  // Exclude overridden fields already included.
+                  (f) => overriddenNames.contains(f.name),
+                ),
+              ),
+        )
+        .toList();
+  }();
 
   void prepareColumns() {
-    for (var param in allFields) {
+    for (final param in allFields) {
       if (columns.any((c) => c.parameter == param)) {
         continue;
       }
 
-      var isList = param.type.isDartCoreList;
-      var dataType =
+      final isList = param.type.isDartCoreList;
+      final dataType =
           isList ? (param.type as InterfaceType).typeArguments[0] : param.type;
       if (!state.schema.tables.containsKey(dataType.element)) {
         columns.add(FieldColumnElement(param, this, state));
       } else {
-        var otherBuilder = state.schema.tables[dataType.element]!;
+        final otherBuilder = state.schema.tables[dataType.element]!;
 
-        var selfHasKey = primaryKeyParameter != null;
-        var otherHasKey = otherBuilder.primaryKeyParameter != null;
+        final selfHasKey = primaryKeyParameter != null;
+        final otherHasKey = otherBuilder.primaryKeyParameter != null;
 
-        var otherParam = otherBuilder.findMatchingParam(param);
-        var selfIsList = param.type.isDartCoreList;
-        var otherIsList = otherParam != null
+        final otherParam = otherBuilder.findMatchingParam(param);
+        final selfIsList = param.type.isDartCoreList;
+        final otherIsList = otherParam != null
             ? otherParam.type.isDartCoreList
             : otherHasKey && !selfIsList;
 
@@ -136,7 +151,7 @@ class TableElement {
         }
 
         if (selfHasKey && otherHasKey && !selfIsList && !otherIsList) {
-          var eitherNullable =
+          final eitherNullable =
               param.type.nullabilitySuffix != NullabilitySuffix.none ||
                   otherParam!.type.nullabilitySuffix != NullabilitySuffix.none;
           if (!eitherNullable) {
@@ -151,12 +166,12 @@ class TableElement {
         if (selfHasKey && otherHasKey && selfIsList && otherIsList) {
           // Many to Many
 
-          var joinBuilder = JoinTableElement(this, otherBuilder, state);
+          final joinBuilder = JoinTableElement(this, otherBuilder, state);
           if (!state.schema.joinTables.containsKey(joinBuilder.tableName)) {
             state.asset.joinTables[joinBuilder.tableName] = joinBuilder;
           }
 
-          var selfColumn =
+          final selfColumn =
               JoinColumnElement(param, otherBuilder, joinBuilder, this, state);
 
           JoinColumnElement otherColumn;
@@ -206,9 +221,9 @@ class TableElement {
       }
     }
 
-    for (var c in columns) {
-      for (var m in c.modifiers) {
-        var viewName = ViewElement.nameOf(m.read('name').objectValue);
+    for (final c in columns) {
+      for (final m in c.modifiers) {
+        final viewName = ViewElement.nameOf(m.read('name').objectValue);
 
         if (!views.containsKey(viewName)) {
           throw 'Model ${element.name} uses a view modifier on an unknown view \'#$viewName\'.\n'
@@ -220,7 +235,7 @@ class TableElement {
 
   void sortColumns() {
     columns.sortBy((column) {
-      var key = '';
+      String key = '';
 
       if (column.parameter != null) {
         // first: columns related to a model field, in declared order
@@ -240,10 +255,11 @@ class TableElement {
   }
 
   FieldElement? findMatchingParam(FieldElement param) {
-    var binding = param.binding;
+    final binding = param.binding;
 
     if (binding != null) {
-      var bindingParam = allFields.where((f) => f.name == binding).firstOrNull;
+      final bindingParam =
+          allFields.where((f) => f.name == binding).firstOrNull;
 
       if (bindingParam == null) {
         throw 'A @BindTo() annotation was used with an incorrect target field. The following field '
@@ -254,7 +270,7 @@ class TableElement {
             'which does not exist in class "${element.getDisplayString(withNullability: false)}.';
       }
 
-      var bindingParamBinding = bindingParam.binding;
+      final bindingParamBinding = bindingParam.binding;
 
       if (bindingParamBinding == null) {
         throw 'A @BindTo() annotation was only used on one field of a relation. The following field '
@@ -273,7 +289,7 @@ class TableElement {
             'Make sure that both fields specify the @BindTo() annotation referring to each other, or neither.';
       }
 
-      var type = bindingParam.type.isDartCoreList
+      final type = bindingParam.type.isDartCoreList
           ? (bindingParam.type as InterfaceType).typeArguments[0]
           : bindingParam.type;
 
@@ -296,12 +312,12 @@ class TableElement {
     }
 
     return allFields.where((p) {
-      var type = p.type.isDartCoreList
+      final type = p.type.isDartCoreList
           ? (p.type as InterfaceType).typeArguments[0]
           : p.type;
       if (type.element != param.enclosingElement) return false;
 
-      var binding = p.binding;
+      final binding = p.binding;
       if (binding == param.name) {
         throw 'A @BindTo() annotation was only used on one field of a relation. The following field'
             'had no binding:\n'
@@ -317,7 +333,7 @@ class TableElement {
 
   String? getForeignKeyName({bool plural = false, String? base}) {
     if (primaryKeyColumn == null) return null;
-    var name = base ?? _getTableName(singular: true);
+    String name = base ?? _getTableName(singular: true);
     if (base != null && plural && name.endsWith('s')) {
       name = name.substring(0, base.length - (base.endsWith('es') ? 2 : 1));
     }
@@ -333,9 +349,9 @@ class TableElement {
     if (meta == null) {
       return null;
     }
-    var views = meta!.read('views');
+    final views = meta!.read('views');
     if (!views.isNull) {
-      var view = views.mapValue.entries
+      final view = views.mapValue.entries
           .where((e) => name == e.key?.toSymbolValue())
           .firstOrNull
           ?.value;
@@ -347,10 +363,22 @@ class TableElement {
   }
 
   void analyzeViews() {
-    for (var view in views.values) {
+    for (final view in views.values) {
       view.analyze();
     }
   }
+
+  @override
+  String toString() => '''TableElement(
+    element: ${element.name},
+    isAbstract: $isAbstract,
+    repoName: $repoName,
+    tableName: $tableName,
+    primaryKeyParameter: $primaryKeyParameter,
+    views.keys: ${{...views.keys}},
+    indexes: $indexes,
+    meta: ${meta?.objectValue},
+  )''';
 }
 
 extension FieldBinding on FieldElement {

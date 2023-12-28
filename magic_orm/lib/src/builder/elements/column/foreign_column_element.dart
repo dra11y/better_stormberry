@@ -48,4 +48,17 @@ class ForeignColumnElement extends ColumnElement
       return true;
     }
   }
+
+  @override
+  String toString() => '''ForeignColumnElement(
+    parentTable.tableName: ${parentTable.tableName},
+    linkedTable.tableName: ${linkedTable.tableName},
+    paramName: $paramName,
+    columnName: $columnName,
+    isList: $isList,
+    isNullable: $isNullable,
+    referencedColumn.paramName: ${referencedColumn.paramName},
+    sqlType: $sqlType,
+    rawSqlType: $rawSqlType,
+  )''';
 }

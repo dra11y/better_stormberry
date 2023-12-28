@@ -30,7 +30,6 @@ class ModelsExporterBuilder extends Builder {
 
   @override
   Future<void> build(BuildStep buildStep) async {
-    print('GlobalOptions: $options');
     final schema = await buildStep.fetchResource<ModelState>(modelResource);
 
     // Loop through all libraries in the project and collect models.

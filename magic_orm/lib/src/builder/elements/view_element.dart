@@ -97,4 +97,15 @@ class ViewElement {
       c.analyzeCircularColumns();
     }
   }
+
+  @override
+  String toString() => '''ViewElement(
+    table: $table,
+    name: $name,
+    isDefaultView: $isDefaultView,
+    className: $className,
+    viewTableName: $viewTableName,
+    queryName: $queryName,
+    columns: <ViewColumnElement>${[...columns.map((c) => c.paramName)]},
+  )''';
 }

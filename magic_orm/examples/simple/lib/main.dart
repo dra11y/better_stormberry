@@ -3,6 +3,7 @@ import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 
 import 'models.export.dart';
 import 'models/address.dart';
+import 'models/company.dart';
 import 'models/latlng.dart';
 
 part 'main.schema.dart';

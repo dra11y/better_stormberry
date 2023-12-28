@@ -6,7 +6,7 @@ import 'invoice.dart';
 import 'party.dart';
 
 @Model(views: [#Full, #Member])
-abstract class Company {
+class Company {
   @PrimaryKey()
   final String id;
 

@@ -11,6 +11,7 @@ final schemaResource = Resource<SchemaState>(() => SchemaState());
 class SchemaState {
   final Map<AssetId, AssetState> _assets = {};
   bool _didFinalize = false;
+  bool hasError = false;
 
   Map<Element, TableElement> get tables =>
       _assets.values.map((a) => a.tables).fold({}, (a, b) => a..addAll(b));

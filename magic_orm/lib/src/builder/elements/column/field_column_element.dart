@@ -111,4 +111,15 @@ class FieldColumnElement extends ColumnElement with NamedColumnElement {
   @override
   bool get isNullable =>
       parameter.type.nullabilitySuffix != NullabilitySuffix.none;
+
+  @override
+  String toString() => '''FieldColumnElement(
+    parentTable.tableName: ${parentTable.tableName},
+    paramName: $paramName,
+    columnName: $columnName,
+    isList: $isList,
+    isNullable: $isNullable,
+    sqlType: $sqlType,
+    rawSqlType: $rawSqlType,
+  )''';
 }

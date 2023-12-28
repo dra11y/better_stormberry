@@ -19,16 +19,20 @@ abstract class OutputBuilder implements Builder {
       return;
     }
 
+    final state = await buildStep.fetchResource(schemaResource);
+    if (state.hasError) {
+      return;
+    }
+
     await buildStep.inputLibrary;
 
     try {
-      var state = await buildStep.fetchResource(schemaResource);
-      var asset = state.getForAsset(buildStep.inputId);
+      final asset = state.getForAsset(buildStep.inputId);
 
       if (asset != null && asset.tables.isNotEmpty) {
-        var output = buildTarget(buildStep, asset);
+        String output = buildTarget(buildStep, asset);
         if (ext == 'dart') {
-          var formatter = DartFormatter(pageWidth: options.lineLength);
+          final formatter = DartFormatter(pageWidth: options.lineLength);
           output = formatter.format(output);
         }
 

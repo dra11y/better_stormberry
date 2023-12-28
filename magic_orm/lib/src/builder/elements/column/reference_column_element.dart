@@ -35,4 +35,14 @@ class ReferenceColumnElement extends ColumnElement
 
   @override
   bool get isList => parameter?.type.isDartCoreList ?? true;
+
+  @override
+  String toString() => '''ReferenceColumnElement(
+    parentTable.tableName: ${parentTable.tableName},
+    linkedTable.tableName: ${linkedTable.tableName},
+    paramName: $paramName,
+    referencedColumn.columnName: ${referencedColumn.columnName},
+    isList: $isList,
+    isNullable: $isNullable,
+  )''';
 }

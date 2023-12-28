@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:code_builder/code_builder.dart';
 import 'package:collection/collection.dart';
 import 'package:source_gen/source_gen.dart';
+
 import '../elements/table_element.dart';
 import '../global_options.dart';
 import '../schema.dart';
@@ -20,14 +20,15 @@ class AnalyzingBuilder implements Builder {
 
   @override
   Future<void> build(BuildStep buildStep) async {
+    final state = await buildStep.fetchResource(schemaResource);
     try {
       if (!await buildStep.resolver.isLibrary(buildStep.inputId)) {
         return;
       }
-      var library = await buildStep.inputLibrary;
-      SchemaState schema = await buildStep.fetchResource(schemaResource);
-      await analyze(schema, library, buildStep.inputId);
+      final library = await buildStep.inputLibrary;
+      await analyze(state, library, buildStep.inputId);
     } catch (e, st) {
+      state.hasError = true;
       print('\x1B[31mFailed to build database schema:\n\n$e\x1B[0m\n');
       print(st);
     }
@@ -39,15 +40,15 @@ class AnalyzingBuilder implements Builder {
       };
 
   Future<void> analyze(
-      SchemaState schema, LibraryElement library, AssetId assetId) async {
-    if (schema.hasAsset(assetId)) return;
+      SchemaState state, LibraryElement library, AssetId assetId) async {
+    if (state.hasAsset(assetId)) return;
 
-    var asset = schema.createForAsset(assetId);
-    var builderState = BuilderState(options, schema, asset);
+    final asset = state.createForAsset(assetId);
+    final builderState = BuilderState(options, state, asset);
 
-    var reader = LibraryReader(library);
+    final reader = LibraryReader(library);
 
-    var databases = reader.annotatedWith(databaseChecker);
+    final databases = reader.annotatedWith(databaseChecker);
 
     for (final database in databases) {
       // print('database: $database');
@@ -61,41 +62,40 @@ class AnalyzingBuilder implements Builder {
                 a.element is ConstructorElement &&
                 modelChecker.isExactly(a.element!.enclosingElement!));
         if (elementAnnotation == null) {
-          throw Exception('@Model annotation not found on $model.');
+          throw Exception('@Model() annotation not found on ${element.name}.'
+              ' Add @Model() annotation.');
+        }
+        if (element is! ClassElement) {
+          throw Exception('@Model: ${element.name} is not a ClassElement!'
+              ' @Model() can only be used on constructable classes.');
+        }
+        if (element.isAbstract) {
+          throw Exception('@Model: ${element.name} is abstract!'
+              ' Remove `abstract` from `${element.getDisplayString(withNullability: false)}`.');
+        }
+        if (element.unnamedConstructor == null) {
+          throw Exception('@Model: ${element.name} has no unnamed constructor!'
+              ' Give ${element.name} a valid unnamed constructor.');
         }
         final annotationValue = elementAnnotation.computeConstantValue()!;
         final annotation = ConstantReader(annotationValue);
         asset.tables[element] = TableElement(
-          element as ClassElement,
+          element,
           annotation,
           builderState,
         );
       }
     }
 
-    if (asset.tables.isNotEmpty) {
-      print('asset.tables: ${asset.tables}');
-    }
+    final packageName = library.source.uri.pathSegments.first;
 
-    // var tables = reader.annotatedWith(modelChecker);
-
-    // for (var table in tables) {
-    //   asset.tables[table.element] = TableElement(
-    //     table.element as ClassElement,
-    //     table.annotation,
-    //     builderState,
-    //   );
-    // }
-
-    var packageName = library.source.uri.pathSegments.first;
-
-    for (var import in library.importedLibraries) {
-      var libUri = import.source.uri;
+    for (final import in library.importedLibraries) {
+      final libUri = import.source.uri;
       if (!isPackage(packageName, libUri)) {
         continue;
       }
 
-      await analyze(schema, import, AssetId.resolve(libUri));
+      await analyze(state, import, AssetId.resolve(libUri));
     }
   }
 
