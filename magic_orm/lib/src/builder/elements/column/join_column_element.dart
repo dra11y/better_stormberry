@@ -33,12 +33,5 @@ class JoinColumnElement extends ColumnElement
   bool get isList => true;
 
   @override
-  String toString() => '''JoinColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    linkedTable.tableName: ${linkedTable.tableName},
-    parameter.name: ${parameter.name},
-    columnName: $columnName,
-    isList: $isList,
-    referencedColumn: ${referencedColumn.columnName},
-  )''';
+  String get description => 'JOIN DESC';
 }

@@ -34,7 +34,7 @@ class ForeignColumnElement extends ColumnElement
 
   @override
   String get columnName =>
-      linkedTable.getForeignKeyName(base: parameter?.name)!;
+      linkedTable.getForeignKeyName(base: parameter?.name) ?? '<NO COLUMN>';
 
   bool get isUnique => !referencedColumn.isList;
 
@@ -50,15 +50,5 @@ class ForeignColumnElement extends ColumnElement
   }
 
   @override
-  String toString() => '''ForeignColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    linkedTable.tableName: ${linkedTable.tableName},
-    paramName: \$paramName (null check!),
-    columnName: \$columnName (null check!),
-    isList: $isList,
-    isNullable: $isNullable,
-    referencedColumn.paramName: \${referencedColumn.paramName} has not been initialized!,
-    sqlType: $sqlType,
-    rawSqlType: $rawSqlType,
-  )''';
+  String get description => paramName;
 }

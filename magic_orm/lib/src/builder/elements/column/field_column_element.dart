@@ -113,13 +113,6 @@ class FieldColumnElement extends ColumnElement with NamedColumnElement {
       parameter.type.nullabilitySuffix != NullabilitySuffix.none;
 
   @override
-  String toString() => '''FieldColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    paramName: $paramName,
-    columnName: $columnName,
-    isList: $isList,
-    isNullable: $isNullable,
-    sqlType: $sqlType,
-    rawSqlType: $rawSqlType,
-  )''';
+  String get description =>
+      'field: ${parameter.type}, sqlType: $sqlType, isList: $isList, columnName: $columnName';
 }

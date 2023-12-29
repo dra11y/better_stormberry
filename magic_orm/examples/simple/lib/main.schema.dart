@@ -233,8 +233,8 @@ class _CompanyRepository extends BaseRepository<PgDatabase>
     if (requests.isEmpty) return;
     var values = QueryValues();
     await db.query(
-      'INSERT INTO "companies" ( "id", "name", "primary_address_id", "primary_address_id", "parent_id", "company_id" )\n'
-      'VALUES ${requests.map((r) => '( ${values.add(r.id)}:text, ${values.add(r.name)}:text, ${values.add(r.primaryAddressId)}:text, ${values.add(r.primaryAddressId)}:text, ${values.add(r.parentId)}:text, ${values.add(r.companyId)}:text )').join(', ')}\n',
+      'INSERT INTO "companies" ( "id", "name", "primary_address_id", "primary_address_id", "parent_id" )\n'
+      'VALUES ${requests.map((r) => '( ${values.add(r.id)}:text, ${values.add(r.name)}:text, ${values.add(r.primaryAddressId)}:text, ${values.add(r.primaryAddressId)}:text, ${values.add(r.parentId)}:text )').join(', ')}\n',
       values.values,
     );
   }
@@ -245,9 +245,9 @@ class _CompanyRepository extends BaseRepository<PgDatabase>
     var values = QueryValues();
     await db.query(
       'UPDATE "companies"\n'
-      'SET "name" = COALESCE(UPDATED."name", "companies"."name"), "primary_address_id" = COALESCE(UPDATED."primary_address_id", "companies"."primary_address_id"), "primary_address_id" = COALESCE(UPDATED."primary_address_id", "companies"."primary_address_id"), "parent_id" = COALESCE(UPDATED."parent_id", "companies"."parent_id"), "company_id" = COALESCE(UPDATED."company_id", "companies"."company_id")\n'
-      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:text::text, ${values.add(r.name)}:text::text, ${values.add(r.primaryAddressId)}:text::text, ${values.add(r.primaryAddressId)}:text::text, ${values.add(r.parentId)}:text::text, ${values.add(r.companyId)}:text::text )').join(', ')} )\n'
-      'AS UPDATED("id", "name", "primary_address_id", "primary_address_id", "parent_id", "company_id")\n'
+      'SET "name" = COALESCE(UPDATED."name", "companies"."name"), "primary_address_id" = COALESCE(UPDATED."primary_address_id", "companies"."primary_address_id"), "primary_address_id" = COALESCE(UPDATED."primary_address_id", "companies"."primary_address_id"), "parent_id" = COALESCE(UPDATED."parent_id", "companies"."parent_id")\n'
+      'FROM ( VALUES ${requests.map((r) => '( ${values.add(r.id)}:text::text, ${values.add(r.name)}:text::text, ${values.add(r.primaryAddressId)}:text::text, ${values.add(r.primaryAddressId)}:text::text, ${values.add(r.parentId)}:text::text )').join(', ')} )\n'
+      'AS UPDATED("id", "name", "primary_address_id", "primary_address_id", "parent_id")\n'
       'WHERE "companies"."id" = UPDATED."id"',
       values.values,
     );

@@ -1,3 +1,4 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 
 import 'account.dart';
@@ -5,17 +6,21 @@ import 'address.dart';
 import 'invoice.dart';
 import 'party.dart';
 
+part 'company.mapper.dart';
+
 @Model()
-class Company {
-  @PrimaryKey()
+@MappableClass()
+class Company with CompanyMappable {
+  @PrimaryKey(multi: true)
   final String? id;
 
+  @PrimaryKey(multi: true)
   final String name;
 
-  @HasOne(field: #companyPrimary)
+  @HasOne(foreignKeyField: #companyPrimary)
   final BillingAddress? primaryAddress;
 
-  @HasMany(field: #companySecondary)
+  @HasMany(foreignKeyField: #companySecondary)
   final List<BillingAddress> secondaryAddresses;
 
   @HasMany()
@@ -24,19 +29,15 @@ class Company {
   @HasMany()
   final List<Invoice> invoices;
 
-  @HasMany(field: #sponsor)
+  @HasMany(foreignKeyField: #sponsor)
   final List<Party> parties;
 
-  @BelongsTo()
+  @BelongsTo(optional: true)
   final Company? parent;
-
-  @BelongsTo()
-  final Company? company;
 
   const Company({
     this.id,
     this.parent,
-    this.company,
     required this.name,
     required this.primaryAddress,
     this.secondaryAddresses = const [],

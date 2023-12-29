@@ -37,12 +37,6 @@ class ReferenceColumnElement extends ColumnElement
   bool get isList => parameter?.type.isDartCoreList ?? true;
 
   @override
-  String toString() => '''ReferenceColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    linkedTable.tableName: ${linkedTable.tableName},
-    paramName: $paramName,
-    referencedColumn.columnName: \${referencedColumn.columnName} has not been initialized!,
-    isList: $isList,
-    isNullable: $isNullable,
-  )''';
+  String get description =>
+      '${parentTable.element.name} ${isList ? '<<' : '<'}- ${parameter?.type}';
 }

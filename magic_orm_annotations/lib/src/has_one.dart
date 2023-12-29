@@ -1,5 +1,5 @@
 class HasOne {
-  const HasOne({this.field});
+  const HasOne({this.foreignKeyField});
 
-  final Symbol? field;
+  final Symbol? foreignKeyField;
 }

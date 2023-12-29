@@ -1,5 +1,5 @@
 class HasMany {
-  const HasMany({this.field});
+  const HasMany({this.foreignKeyField});
 
-  final Symbol? field;
+  final Symbol? foreignKeyField;
 }

@@ -13,16 +13,6 @@ mixin NamedColumnElement implements ParameterColumnElement {
   bool get isNullable;
   String get sqlType;
   String get rawSqlType;
-
-  @override
-  String toString() => '''NamedColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    columnName: $columnName,
-    isList: $isList,
-    isNullable: $isNullable,
-    sqlType: $sqlType,
-    rawSqlType: $rawSqlType,
-  )''';
 }
 
 mixin RelationalColumnElement implements ColumnElement {
@@ -45,48 +35,20 @@ mixin RelationalColumnElement implements ColumnElement {
           '${duplicated.map((d) => '  - @${d.toSource()}').join('\n')}';
     }
   }
-
-  @override
-  String toString() => '''RelationalColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    isList: $isList,
-  )''';
 }
 
 mixin LinkedColumnElement implements ColumnElement {
   TableElement get linkedTable;
-
-  @override
-  String toString() => '''LinkedColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    linkedTable.tableName: ${linkedTable.tableName},
-    isList: $isList,
-  )''';
 }
 
 mixin ReferencingColumnElement
     implements LinkedColumnElement, ParameterColumnElement {
   ReferencingColumnElement get referencedColumn;
   set referencedColumn(ReferencingColumnElement c);
-
-  @override
-  String toString() => '''ReferencingColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    linkedTable.tableName: ${linkedTable.tableName},
-    referencedColumn.paramName: ${referencedColumn.paramName},
-    isList: $isList,
-  )''';
 }
 
 mixin ParameterColumnElement implements ColumnElement {
   String get paramName;
-
-  @override
-  String toString() => '''ParameterColumnElement(
-    parentTable.tableName: ${parentTable.tableName},
-    paramName: $paramName,
-    isList: $isList,
-  )''';
 }
 
 abstract class ColumnElement {
@@ -99,6 +61,8 @@ abstract class ColumnElement {
   }
 
   FieldElement? get parameter;
+
+  String get description;
 
   bool get isList;
 
@@ -147,10 +111,7 @@ abstract class ColumnElement {
   void checkModifiers();
 
   @override
-  String toString() => '''ColumnElement ($runtimeType) (
-    parentTable.tableName: ${parentTable.tableName},
-    isList: $isList,
-  )''';
+  String toString() => '$runtimeType($description)';
 }
 
 String? getSqlType(DartType type) {

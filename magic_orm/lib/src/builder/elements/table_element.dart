@@ -223,11 +223,13 @@ class TableElement {
       stdout.writeln('\t NOT MANY-TO-MANY');
 
       if (otherHasKey && !selfIsList) {
+        // @BelongsTo()
         selfColumn = ForeignColumnElement(param, otherBuilder, this, state);
-        stdout.writeln('\t\t otherHasKey && !selfIsList:');
+        stdout.writeln('\t\t @BelongsTo() selfColumn = ForeignColumnElement');
       } else {
+        // @HasMany()
         selfColumn = ReferenceColumnElement(param, otherBuilder, this, state);
-        stdout.writeln('\t\t !otherHasKey || selfIsList:');
+        stdout.writeln('\t\t @HasMany() selfColumn = ReferenceColumnElement');
       }
       stdout.writeln('\t\t selfColumn = $selfColumn');
 
@@ -246,14 +248,18 @@ class TableElement {
         if (selfHasKey &&
             !otherIsList &&
             (selfColumn is! ForeignColumnElement || this != otherBuilder)) {
-          // BELONGS TO
-          stdout.writeln('\t\t\t selfHasKey && !otherIsList ...');
+          // @BelongsTo()
+          // stdout.writeln('\t\t\t selfHasKey && !otherIsList ...');
+          stdout.writeln(
+              '\t\t\t @BelongsTo() otherColumn = ForeignColumnElement');
 
           otherColumn =
               ForeignColumnElement(otherParam, this, otherBuilder, state);
         } else {
-          // HAS MANY
-          stdout.writeln('\t\t\t !(selfHasKey && !otherIsList ...)');
+          // @BelongsTo()
+          // stdout.writeln('\t\t\t !(selfHasKey && !otherIsList ...)');
+          stdout.writeln(
+              '\t\t\t @BelongsTo() otherColumn = ReferenceColumnElement');
           otherColumn =
               ReferenceColumnElement(otherParam, this, otherBuilder, state);
         }

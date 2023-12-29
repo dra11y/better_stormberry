@@ -26,7 +26,7 @@ builders:
     build_extensions: { ".dart": [ ".schema.dart" ] }
     auto_apply: dependents
     build_to: source
-    runs_before: ["dart_mappable_builder", "freezed", "json_serializable"]
+    runs_before: [":runner"]
   runner:
     import: "package:magic_orm/builders.dart"
     builder_factories: [ "buildRunner" ]
