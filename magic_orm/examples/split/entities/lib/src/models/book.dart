@@ -4,7 +4,6 @@ import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 import 'author.dart';
 
 part 'book.mapper.dart';
-part 'book.schema.dart';
 
 @MappableClass()
 @Model()

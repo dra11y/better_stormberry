@@ -3,28 +3,31 @@ import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 import 'account.dart';
 import 'company.dart';
 
-@Model(views: [#Guest, #Company])
+part 'party.relation.dart';
+
+@Model()
 class Party {
   @PrimaryKey()
-  final String id;
+  final String? id;
 
   final String name;
 
-  @HiddenIn(#Guest)
-  @HiddenIn(#Company)
+  @HasMany()
   final List<Account> guests;
 
-  @ViewedIn(#Guest, as: #Member)
-  @HiddenIn(#Company)
+  @BelongsTo()
   final Company? sponsor;
 
-  final int date;
+  final DateTime date;
+
+  final $PartyRelationInfo relationInfo;
 
   const Party({
-    required this.id,
+    this.id,
     required this.name,
     required this.guests,
     required this.sponsor,
     required this.date,
+    this.relationInfo = const $PartyRelationInfo(),
   });
 }

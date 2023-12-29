@@ -128,20 +128,21 @@ abstract class ColumnElement {
 
   void checkConverter();
 
-  late List<ConstantReader> modifiers = () {
-    if (parameter == null || parameter!.getter == null) {
-      return <ConstantReader>[];
-    }
+  late List<ConstantReader> modifiers = [];
+  //  () {
+  //   if (parameter == null || parameter!.getter == null) {
+  //     return <ConstantReader>[];
+  //   }
 
-    return [
-      ...hiddenInChecker.annotationsOf(parameter!),
-      ...hiddenInChecker.annotationsOf(parameter!.getter!),
-      ...viewedInChecker.annotationsOf(parameter!),
-      ...viewedInChecker.annotationsOf(parameter!.getter!),
-      ...transformedInChecker.annotationsOf(parameter!),
-      ...transformedInChecker.annotationsOf(parameter!.getter!),
-    ].map((m) => ConstantReader(m)).toList();
-  }();
+  //   return [
+  //     ...hiddenInChecker.annotationsOf(parameter!),
+  //     ...hiddenInChecker.annotationsOf(parameter!.getter!),
+  //     ...viewedInChecker.annotationsOf(parameter!),
+  //     ...viewedInChecker.annotationsOf(parameter!.getter!),
+  //     ...transformedInChecker.annotationsOf(parameter!),
+  //     ...transformedInChecker.annotationsOf(parameter!.getter!),
+  //   ].map((m) => ConstantReader(m)).toList();
+  // }();
 
   void checkModifiers();
 

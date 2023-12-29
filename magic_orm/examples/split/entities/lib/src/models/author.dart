@@ -2,7 +2,6 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 
 part 'author.mapper.dart';
-part 'author.schema.dart';
 
 @MappableClass()
 @Model()

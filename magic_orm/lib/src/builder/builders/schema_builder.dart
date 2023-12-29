@@ -12,10 +12,10 @@ class SchemaBuilder extends OutputBuilder {
   String buildTarget(BuildStep buildStep, AssetState asset) {
     return '''
       // ignore_for_file: annotate_overrides
-      
+
       part of '${path.basename(buildStep.inputId.path)}';
-      
-      ${RepositoryGenerator().generateRepositories(asset)}
+
+      ${const RepositoryGenerator().generateRepositories(asset)}
     ''';
   }
 }

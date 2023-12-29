@@ -1,0 +1,3 @@
+class BelongsTo {
+  const BelongsTo();
+}

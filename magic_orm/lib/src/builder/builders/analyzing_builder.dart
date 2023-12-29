@@ -21,6 +21,9 @@ class AnalyzingBuilder implements Builder {
   @override
   Future<void> build(BuildStep buildStep) async {
     final state = await buildStep.fetchResource(schemaResource);
+    if (state.hasError) {
+      return;
+    }
     try {
       if (!await buildStep.resolver.isLibrary(buildStep.inputId)) {
         return;
@@ -53,7 +56,11 @@ class AnalyzingBuilder implements Builder {
     for (final database in databases) {
       // print('database: $database');
       // print('annotation: ${database.annotation}');
-      final models = database.annotation.read('models').listValue;
+      final modelsReader = database.annotation.read('models');
+      if (!modelsReader.isList) {
+        throw Exception('No models found!');
+      }
+      final models = modelsReader.listValue;
 
       for (final model in models) {
         final element = model.toTypeValue()!.element!;
@@ -79,11 +86,12 @@ class AnalyzingBuilder implements Builder {
         }
         final annotationValue = elementAnnotation.computeConstantValue()!;
         final annotation = ConstantReader(annotationValue);
-        asset.tables[element] = TableElement(
+        final tableElement = TableElement(
           element,
           annotation,
           builderState,
         );
+        asset.tables[element] = tableElement;
       }
     }
 

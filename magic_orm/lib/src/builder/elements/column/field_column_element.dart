@@ -54,11 +54,11 @@ class FieldColumnElement extends ColumnElement with NamedColumnElement {
 
   @override
   void checkModifiers() {
-    var viewModifiers = modifiers.where((m) => m.instanceOf(viewedInChecker));
-    if (viewModifiers.isNotEmpty) {
-      throw 'Column field was annotated with "${viewModifiers.first.toSource()}", which is not supported.\n'
-          '  - ${parameter.getDisplayString(withNullability: true)}';
-    }
+    // var viewModifiers = modifiers.where((m) => m.instanceOf(viewedInChecker));
+    // if (viewModifiers.isNotEmpty) {
+    //   throw 'Column field was annotated with "${viewModifiers.first.toSource()}", which is not supported.\n'
+    //       '  - ${parameter.getDisplayString(withNullability: true)}';
+    // }
   }
 
   @override
@@ -87,18 +87,18 @@ class FieldColumnElement extends ColumnElement with NamedColumnElement {
     var type = isList ? '_' : '';
 
     if (converter != null) {
-      type += ConstantReader(converter).read('type').stringValue;
-    } else {
-      var t = getSqlType(dataType);
-      if (t != null) {
-        type += t;
-      } else {
-        throw 'The following field has an unsupported type:\n'
-            '  - Field "${parameter.getDisplayString(withNullability: true)}" in class "${parentTable.element.getDisplayString(withNullability: true)}"\n'
-            'Either change the type to a supported column type, make the class a [Model] or use a custom [TypeConverter] with [@UseConverter].';
-      }
+      return type + ConstantReader(converter).read('type').stringValue;
     }
-    return type;
+
+    var t = getSqlType(dataType);
+    if (t != null) {
+      type += t;
+      return type;
+    }
+
+    throw 'The following field has an unsupported type:\n'
+        '  - Field "${parameter.getDisplayString(withNullability: true)}" in class "${parentTable.element.getDisplayString(withNullability: true)}"\n'
+        'Either change the type to a supported column type, make the class a [Model] or use a custom [TypeConverter] with [@UseConverter].';
   }
 
   @override

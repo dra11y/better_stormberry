@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -14,7 +16,6 @@ import 'column/join_column_element.dart';
 import 'column/reference_column_element.dart';
 import 'index_element.dart';
 import 'join_table_element.dart';
-import 'view_element.dart';
 
 extension EnumType on DartType {
   bool get isEnum => TypeChecker.fromRuntime(Enum).isAssignableFromType(this);
@@ -29,7 +30,7 @@ class TableElement {
   late String repoName;
   late String tableName;
   late FieldElement? primaryKeyParameter;
-  late Map<String, ViewElement> views;
+  // late Map<String, ViewElement> views;
   late List<IndexElement> indexes;
   ConstantReader? meta;
 
@@ -44,16 +45,16 @@ class TableElement {
             primaryKeyChecker.hasAnnotationOf(p.getter ?? p))
         .firstOrNull;
 
-    views = {};
+    // views = {};
 
-    for (final o in annotation.read('views').listValue) {
-      final name = ViewElement.nameOf(o);
-      views[name] = ViewElement(this, name);
-    }
+    // for (final o in annotation.read('views').listValue) {
+    //   final name = ViewElement.nameOf(o);
+    //   views[name] = ViewElement(this, name);
+    // }
 
-    if (views.isEmpty) {
-      views[ViewElement.defaultName] = ViewElement(this);
-    }
+    // if (views.isEmpty) {
+    //   views[ViewElement.defaultName] = ViewElement(this);
+    // }
 
     indexes = annotation.read('indexes').listValue.map((o) {
       return IndexElement(this, o);
@@ -116,121 +117,166 @@ class TableElement {
   }();
 
   void prepareColumns() {
+    stdout
+        .writeln('\n==================== ${element.name} ====================');
+
     for (final param in allFields) {
+      if (param.type is InvalidType) {
+        throw Exception(
+            'Field `${param.name}` on ${param.enclosingElement} has an invalid type.');
+      }
+
       if (columns.any((c) => c.parameter == param)) {
+        stdout.writeln('\nSKIP already defined column: $param');
         continue;
       }
+
+      /// Skip `RelationInfo` fields.
+      if (relationInfoChecker.isSuperTypeOf(param.type)) {
+        stdout.writeln('\nSKIP relation info field');
+        continue;
+      }
+
+      stdout.writeln('\nFIELD: ${param.type} ${param.name}');
 
       final isList = param.type.isDartCoreList;
       final dataType =
           isList ? (param.type as InterfaceType).typeArguments[0] : param.type;
+
       if (!state.schema.tables.containsKey(dataType.element)) {
+        // Not a relational column.
+        stdout.writeln('\t FIELD COLUMN (not relational)');
         columns.add(FieldColumnElement(param, this, state));
-      } else {
-        final otherBuilder = state.schema.tables[dataType.element]!;
+        continue;
+      }
 
-        final selfHasKey = primaryKeyParameter != null;
-        final otherHasKey = otherBuilder.primaryKeyParameter != null;
+      final otherBuilder = state.schema.tables[dataType.element]!;
 
-        final otherParam = otherBuilder.findMatchingParam(param);
-        final selfIsList = param.type.isDartCoreList;
-        final otherIsList = otherParam != null
-            ? otherParam.type.isDartCoreList
-            : otherHasKey && !selfIsList;
+      final selfHasKey = primaryKeyParameter != null;
+      final otherHasKey = otherBuilder.primaryKeyParameter != null;
 
-        if (!selfHasKey && !otherHasKey) {
-          throw 'Model ${otherBuilder.element.name} cannot have a relation to model ${element.name} because neither model'
-              'has a primary key. Define a primary key for at least one of the models in a relation.';
+      final otherParam = otherBuilder.findMatchingParam(param);
+      final selfIsList = param.type.isDartCoreList;
+      final otherIsList = otherParam != null
+          ? otherParam.type.isDartCoreList
+          : otherHasKey && !selfIsList;
+
+      if (!selfHasKey && !otherHasKey) {
+        throw 'Model ${otherBuilder.element.name} cannot have a relation to model ${element.name} because neither model'
+            'has a primary key. Define a primary key for at least one of the models in a relation.';
+      }
+
+      if (selfHasKey && !otherHasKey && otherIsList) {
+        throw 'Model ${otherBuilder.element.name} cannot have a many-to-'
+            '${selfIsList ? 'many' : 'one'} relation to model ${element.name} without specifying a primary key.\n'
+            'Either define a primary key for ${otherBuilder.element.name} or change the relation by changing field '
+            '"${otherParam!.getDisplayString(withNullability: true)}" to have a non-list type.';
+      }
+
+      if (selfHasKey && otherHasKey && !selfIsList && !otherIsList) {
+        final eitherNullable =
+            param.type.nullabilitySuffix != NullabilitySuffix.none ||
+                otherParam!.type.nullabilitySuffix != NullabilitySuffix.none;
+        if (!eitherNullable) {
+          throw 'Model ${otherBuilder.element.name} cannot have a one-to-one relation to model ${element.name} with '
+              'both sides being non-nullable. At least one side has to be nullable, to insert one model before the other.\n'
+              'However both "${element.name}.${param.name}" and "${otherBuilder.element.name}.${otherParam.name}" '
+              'are non-nullable.\n'
+              'Either make at least one parameter nullable or change the relation by changing one parameter to have a list type.';
+        }
+      }
+
+      if (selfHasKey && otherHasKey && selfIsList && otherIsList) {
+        // Many to Many
+
+        final joinBuilder = JoinTableElement(this, otherBuilder, state);
+        if (!state.schema.joinTables.containsKey(joinBuilder.tableName)) {
+          state.asset.joinTables[joinBuilder.tableName] = joinBuilder;
         }
 
-        if (selfHasKey && !otherHasKey && otherIsList) {
-          throw 'Model ${otherBuilder.element.name} cannot have a many-to-'
-              '${selfIsList ? 'many' : 'one'} relation to model ${element.name} without specifying a primary key.\n'
-              'Either define a primary key for ${otherBuilder.element.name} or change the relation by changing field '
-              '"${otherParam!.getDisplayString(withNullability: true)}" to have a non-list type.';
-        }
+        final selfColumn =
+            JoinColumnElement(param, otherBuilder, joinBuilder, this, state);
+        stdout.writeln('\t MANY TO MANY JOIN: $tableName ${param.name}');
 
-        if (selfHasKey && otherHasKey && !selfIsList && !otherIsList) {
-          final eitherNullable =
-              param.type.nullabilitySuffix != NullabilitySuffix.none ||
-                  otherParam!.type.nullabilitySuffix != NullabilitySuffix.none;
-          if (!eitherNullable) {
-            throw 'Model ${otherBuilder.element.name} cannot have a one-to-one relation to model ${element.name} with '
-                'both sides being non-nullable. At least one side has to be nullable, to insert one model before the other.\n'
-                'However both "${element.name}.${param.name}" and "${otherBuilder.element.name}.${otherParam.name}" '
-                'are non-nullable.\n'
-                'Either make at least one parameter nullable or change the relation by changing one parameter to have a list type.';
-          }
-        }
+        JoinColumnElement otherColumn;
+        if (param != otherParam) {
+          stdout.writeln('\t OTHER = OTHER: ${otherParam?.name}');
 
-        if (selfHasKey && otherHasKey && selfIsList && otherIsList) {
-          // Many to Many
-
-          final joinBuilder = JoinTableElement(this, otherBuilder, state);
-          if (!state.schema.joinTables.containsKey(joinBuilder.tableName)) {
-            state.asset.joinTables[joinBuilder.tableName] = joinBuilder;
-          }
-
-          final selfColumn =
-              JoinColumnElement(param, otherBuilder, joinBuilder, this, state);
-
-          JoinColumnElement otherColumn;
-          if (param != otherParam) {
-            otherColumn = JoinColumnElement(
-                otherParam!, this, joinBuilder, otherBuilder, state);
-            otherColumn.referencedColumn = selfColumn;
-            otherBuilder.columns.add(otherColumn);
-          } else {
-            otherColumn = selfColumn;
-          }
-
-          selfColumn.referencedColumn = otherColumn;
-          columns.add(selfColumn);
+          otherColumn = JoinColumnElement(
+              otherParam!, this, joinBuilder, otherBuilder, state);
+          otherColumn.referencedColumn = selfColumn;
+          otherBuilder.columns.add(otherColumn);
         } else {
-          ReferencingColumnElement selfColumn;
+          stdout.writeln('\t OTHER = SELF: ${selfColumn.columnName}');
 
-          if (otherHasKey && !selfIsList) {
-            selfColumn = ForeignColumnElement(param, otherBuilder, this, state);
-          } else {
-            selfColumn =
-                ReferenceColumnElement(param, otherBuilder, this, state);
-          }
-
-          columns.add(selfColumn);
-
-          ReferencingColumnElement otherColumn;
-
-          if (param == otherParam) {
-            otherColumn = selfColumn;
-          } else {
-            if (selfHasKey &&
-                !otherIsList &&
-                (selfColumn is! ForeignColumnElement || this != otherBuilder)) {
-              otherColumn =
-                  ForeignColumnElement(otherParam, this, otherBuilder, state);
-            } else {
-              otherColumn =
-                  ReferenceColumnElement(otherParam, this, otherBuilder, state);
-            }
-            otherBuilder.columns.add(otherColumn);
-            otherColumn.referencedColumn = selfColumn;
-          }
-
-          selfColumn.referencedColumn = otherColumn;
+          otherColumn = selfColumn;
         }
+
+        selfColumn.referencedColumn = otherColumn;
+        columns.add(selfColumn);
+        continue;
       }
+
+      // not many-to-many
+
+      ReferencingColumnElement selfColumn;
+      stdout.writeln('\t NOT MANY-TO-MANY');
+
+      if (otherHasKey && !selfIsList) {
+        selfColumn = ForeignColumnElement(param, otherBuilder, this, state);
+        stdout.writeln('\t\t otherHasKey && !selfIsList:');
+      } else {
+        selfColumn = ReferenceColumnElement(param, otherBuilder, this, state);
+        stdout.writeln('\t\t !otherHasKey || selfIsList:');
+      }
+      stdout.writeln('\t\t selfColumn = $selfColumn');
+
+      columns.add(selfColumn);
+
+      ReferencingColumnElement otherColumn;
+
+      if (param == otherParam) {
+        // SELF REFERENCING?
+        stdout.writeln('\t\t param == otherParam');
+
+        otherColumn = selfColumn;
+      } else {
+        stdout.writeln('\t\t param != otherParam');
+
+        if (selfHasKey &&
+            !otherIsList &&
+            (selfColumn is! ForeignColumnElement || this != otherBuilder)) {
+          // BELONGS TO
+          stdout.writeln('\t\t\t selfHasKey && !otherIsList ...');
+
+          otherColumn =
+              ForeignColumnElement(otherParam, this, otherBuilder, state);
+        } else {
+          // HAS MANY
+          stdout.writeln('\t\t\t !(selfHasKey && !otherIsList ...)');
+          otherColumn =
+              ReferenceColumnElement(otherParam, this, otherBuilder, state);
+        }
+        otherBuilder.columns.add(otherColumn);
+        otherColumn.referencedColumn = selfColumn;
+      }
+      stdout.writeln('\t\t\t otherColumn = $otherColumn');
+
+      selfColumn.referencedColumn = otherColumn;
     }
 
-    for (final c in columns) {
-      for (final m in c.modifiers) {
-        final viewName = ViewElement.nameOf(m.read('name').objectValue);
+    stdout.writeln();
 
-        if (!views.containsKey(viewName)) {
-          throw 'Model ${element.name} uses a view modifier on an unknown view \'#$viewName\'.\n'
-              'Make sure to add this view to @Model(views: [...]).';
-        }
-      }
-    }
+    // for (final c in columns) {
+    //   for (final m in c.modifiers) {
+    //     final viewName = ViewElement.nameOf(m.read('name').objectValue);
+
+    //     if (!views.containsKey(viewName)) {
+    //       throw 'Model ${element.name} uses a view modifier on an unknown view \'#$viewName\'.\n'
+    //           'Make sure to add this view to @Model(views: [...]).';
+    //     }
+    //   }
+    // }
   }
 
   void sortColumns() {
@@ -345,28 +391,28 @@ class TableElement {
     return name;
   }
 
-  ConstantReader? metaFor(String name) {
-    if (meta == null) {
-      return null;
-    }
-    final views = meta!.read('views');
-    if (!views.isNull) {
-      final view = views.mapValue.entries
-          .where((e) => name == e.key?.toSymbolValue())
-          .firstOrNull
-          ?.value;
-      if (view != null && !view.isNull) {
-        return ConstantReader(view);
-      }
-    }
-    return meta!.read('view');
-  }
+  // ConstantReader? metaFor(String name) {
+  //   if (meta == null) {
+  //     return null;
+  //   }
+  //   final views = meta!.read('views');
+  //   if (!views.isNull) {
+  //     final view = views.mapValue.entries
+  //         .where((e) => name == e.key?.toSymbolValue())
+  //         .firstOrNull
+  //         ?.value;
+  //     if (view != null && !view.isNull) {
+  //       return ConstantReader(view);
+  //     }
+  //   }
+  //   return meta!.read('view');
+  // }
 
-  void analyzeViews() {
-    for (final view in views.values) {
-      view.analyze();
-    }
-  }
+  // void analyzeViews() {
+  //   for (final view in views.values) {
+  //     view.analyze();
+  //   }
+  // }
 
   @override
   String toString() => '''TableElement(
@@ -375,7 +421,6 @@ class TableElement {
     repoName: $repoName,
     tableName: $tableName,
     primaryKeyParameter: $primaryKeyParameter,
-    views.keys: ${{...views.keys}},
     indexes: $indexes,
     meta: ${meta?.objectValue},
   )''';

@@ -5,33 +5,43 @@ import 'address.dart';
 import 'invoice.dart';
 import 'party.dart';
 
-@Model(views: [#Full, #Member])
+@Model()
 class Company {
   @PrimaryKey()
-  final String id;
+  final String? id;
 
   final String name;
 
-  final List<BillingAddress> addresses;
+  @HasOne(field: #companyPrimary)
+  final BillingAddress? primaryAddress;
 
-  @HiddenIn(#Member)
-  @ViewedIn(#Full, as: #Company)
+  @HasMany(field: #companySecondary)
+  final List<BillingAddress> secondaryAddresses;
+
+  @HasMany()
   final List<Account> members;
 
-  @HiddenIn(#Member)
-  @ViewedIn(#Full, as: #Owner)
+  @HasMany()
   final List<Invoice> invoices;
 
-  @HiddenIn(#Member)
-  @ViewedIn(#Full, as: #Company)
+  @HasMany(field: #sponsor)
   final List<Party> parties;
 
+  @BelongsTo()
+  final Company? parent;
+
+  @BelongsTo()
+  final Company? company;
+
   const Company({
-    required this.id,
+    this.id,
+    this.parent,
+    this.company,
     required this.name,
-    required this.addresses,
-    required this.members,
-    required this.invoices,
-    required this.parties,
+    required this.primaryAddress,
+    this.secondaryAddresses = const [],
+    this.members = const [],
+    this.invoices = const [],
+    this.parties = const [],
   });
 }

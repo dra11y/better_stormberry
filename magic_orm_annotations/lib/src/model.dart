@@ -6,7 +6,7 @@ import 'table_index.dart';
 /// {@category Models}
 class Model {
   /// The list of views this model defined.
-  final List<Symbol> views;
+  // final List<Symbol> views;
 
   /// A list of indexes that should be created for this table.
   final List<TableIndex> indexes;
@@ -18,12 +18,12 @@ class Model {
   final ModelMeta? meta;
 
   const Model({
-    this.views = const [],
+    // this.views = const [],
     this.indexes = const [],
     this.tableName,
     this.meta,
   });
 
   /// The default view of a model.
-  static const Symbol defaultView = #$default$;
+  // static const Symbol defaultView = #$default$;
 }

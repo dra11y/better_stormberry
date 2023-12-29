@@ -6,6 +6,8 @@ import '../elements/table_element.dart';
 import '../utils.dart';
 
 class InsertGenerator {
+  const InsertGenerator();
+
   String generateInsertMethod(TableElement table) {
     var deepInserts = <String>[];
 

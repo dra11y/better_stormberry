@@ -41,9 +41,9 @@ class SchemaState {
       for (var element in tables.values) {
         element.sortColumns();
       }
-      for (var element in tables.values) {
-        element.analyzeViews();
-      }
+      // for (var element in tables.values) {
+      //   element.analyzeViews();
+      // }
       _didFinalize = true;
     }
   }

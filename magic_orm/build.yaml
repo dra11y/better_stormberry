@@ -1,6 +1,13 @@
 builders:
   magic_orm:
     import: "package:magic_orm/builders.dart"
+    builder_factories: [ "buildRelationInfos" ]
+    build_extensions: { ".dart": [".relation.dart"] }
+    auto_apply: dependents
+    build_to: source
+    runs_before: [":exporter", ":analyzer", ":schema", ":runner"]
+  exporter:
+    import: "package:magic_orm/builders.dart"
     builder_factories: [ "buildModelsExporter" ]
     build_extensions: { "$lib$": ["models.export.dart"] }
     auto_apply: dependents

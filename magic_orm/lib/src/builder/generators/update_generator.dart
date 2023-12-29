@@ -6,6 +6,8 @@ import '../elements/table_element.dart';
 import '../utils.dart';
 
 class UpdateGenerator {
+  const UpdateGenerator();
+
   String generateUpdateMethod(TableElement table) {
     var deepUpdates = <String>[];
 
@@ -169,7 +171,7 @@ class UpdateGenerator {
     return '''
       ${defineClassWithMeta(requestClassName, table.meta?.read('update'))}
         $requestClassName(${constructorParameters.isNotEmpty ? '{$constructorParameters}' : ''});
-        
+
         ${requestFields.map((f) => 'final ${f.key} ${f.value};').join('\n')}
       }
     ''';

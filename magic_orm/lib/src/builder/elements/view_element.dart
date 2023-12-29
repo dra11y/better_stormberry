@@ -1,111 +1,111 @@
-import 'package:analyzer/dart/constant/value.dart';
-import 'package:magic_orm_annotations/magic_orm_annotations.dart';
-import 'package:collection/collection.dart';
+// import 'package:analyzer/dart/constant/value.dart';
+// import 'package:magic_orm_annotations/magic_orm_annotations.dart';
+// import 'package:collection/collection.dart';
 
-import '../../core/case_style.dart';
-import '../utils.dart';
-import 'column/column_element.dart';
-import 'column/view_column_element.dart';
-import 'table_element.dart';
+// import '../../core/case_style.dart';
+// import '../utils.dart';
+// import 'column/column_element.dart';
+// import 'column/view_column_element.dart';
+// import 'table_element.dart';
 
-class ViewElement {
-  final TableElement table;
-  final String name;
+// class ViewElement {
+//   final TableElement table;
+//   final String name;
 
-  ViewElement(this.table, [this.name = defaultName]);
+//   ViewElement(this.table, [this.name = defaultName]);
 
-  static String nameOf(DartObject object) {
-    var name = object.toSymbolValue()!;
-    if (Symbol(name) == Model.defaultView) {
-      name = defaultName;
-    }
-    return name;
-  }
+//   static String nameOf(DartObject object) {
+//     var name = object.toSymbolValue()!;
+//     if (Symbol(name) == Model.defaultView) {
+//       name = defaultName;
+//     }
+//     return name;
+//   }
 
-  static const String defaultName = '';
+//   static const String defaultName = '';
 
-  bool get isDefaultView => name == defaultName;
+//   bool get isDefaultView => name == defaultName;
 
-  String get className => CaseStyle.pascalCase.transform(
-      '${!isDefaultView ? '${name}_' : ''}${table.element.name}_view');
+//   String get className => CaseStyle.pascalCase.transform(
+//       '${!isDefaultView ? '${name}_' : ''}${table.element.name}_view');
 
-  String get viewTableName => CaseStyle.snakeCase
-      .transform('${!isDefaultView ? '${name}_' : ''}${table.tableName}_view');
+//   String get viewTableName => CaseStyle.snakeCase
+//       .transform('${!isDefaultView ? '${name}_' : ''}${table.tableName}_view');
 
-  String get queryName => CaseStyle.pascalCase
-      .transform(isDefaultView ? table.element.name : '${name}_view');
+//   String get queryName => CaseStyle.pascalCase
+//       .transform(isDefaultView ? table.element.name : '${name}_view');
 
-  late List<ViewColumnElement> columns = () {
-    var columns = <ViewColumnElement>[];
+//   late List<ViewColumnElement> columns = () {
+//     var columns = <ViewColumnElement>[];
 
-    for (var column in table.columns) {
-      if (column.parameter == null) {
-        continue;
-      }
+//     for (var column in table.columns) {
+//       if (column.parameter == null) {
+//         continue;
+//       }
 
-      var modifiers = column.modifiers.where((m) =>
-          nameOf(m.read('name').objectValue).toLowerCase() ==
-          name.toLowerCase());
-      if (modifiers.isNotEmpty) {
-        var isHidden = modifiers.any((m) => m.instanceOf(hiddenInChecker));
-        if (isHidden) {
-          continue;
-        }
+//       var modifiers = column.modifiers.where((m) =>
+//           nameOf(m.read('name').objectValue).toLowerCase() ==
+//           name.toLowerCase());
+//       if (modifiers.isNotEmpty) {
+//         var isHidden = modifiers.any((m) => m.instanceOf(hiddenInChecker));
+//         if (isHidden) {
+//           continue;
+//         }
 
-        var viewModifier =
-            modifiers.where((m) => m.instanceOf(viewedInChecker)).firstOrNull;
-        var viewAs = viewModifier != null
-            ? nameOf(viewModifier.read('as').objectValue)
-            : null;
+//         var viewModifier =
+//             modifiers.where((m) => m.instanceOf(viewedInChecker)).firstOrNull;
+//         var viewAs = viewModifier != null
+//             ? nameOf(viewModifier.read('as').objectValue)
+//             : null;
 
-        if (viewAs == null && column is LinkedColumnElement) {
-          if (!column.linkedTable.views.values.any((v) => v.isDefaultView)) {
-            column.linkedTable.views[defaultName] =
-                ViewElement(column.linkedTable);
-          }
-        }
+//         if (viewAs == null && column is LinkedColumnElement) {
+//           if (!column.linkedTable.views.values.any((v) => v.isDefaultView)) {
+//             column.linkedTable.views[defaultName] =
+//                 ViewElement(column.linkedTable);
+//           }
+//         }
 
-        var transformer = modifiers
-            .where((m) => m.instanceOf(transformedInChecker))
-            .firstOrNull
-            ?.read('by');
+//         var transformer = modifiers
+//             .where((m) => m.instanceOf(transformedInChecker))
+//             .firstOrNull
+//             ?.read('by');
 
-        String? transformerCode;
-        if (transformer != null && !transformer.isNull) {
-          transformerCode = transformer.toSource();
-        }
+//         String? transformerCode;
+//         if (transformer != null && !transformer.isNull) {
+//           transformerCode = transformer.toSource();
+//         }
 
-        columns.add(ViewColumnElement(column,
-            viewAs: viewAs, transformer: transformerCode));
-      } else {
-        if (column is LinkedColumnElement) {
-          if (!column.linkedTable.views.values.any((v) => v.isDefaultView)) {
-            column.linkedTable.views[defaultName] =
-                ViewElement(column.linkedTable);
-          }
-        }
+//         columns.add(ViewColumnElement(column,
+//             viewAs: viewAs, transformer: transformerCode));
+//       } else {
+//         if (column is LinkedColumnElement) {
+//           if (!column.linkedTable.views.values.any((v) => v.isDefaultView)) {
+//             column.linkedTable.views[defaultName] =
+//                 ViewElement(column.linkedTable);
+//           }
+//         }
 
-        columns.add(ViewColumnElement(column));
-      }
-    }
+//         columns.add(ViewColumnElement(column));
+//       }
+//     }
 
-    return columns;
-  }();
+//     return columns;
+//   }();
 
-  void analyze() {
-    for (var c in columns) {
-      c.analyzeCircularColumns();
-    }
-  }
+//   void analyze() {
+//     for (var c in columns) {
+//       c.analyzeCircularColumns();
+//     }
+//   }
 
-  @override
-  String toString() => '''ViewElement(
-    table: $table,
-    name: $name,
-    isDefaultView: $isDefaultView,
-    className: $className,
-    viewTableName: $viewTableName,
-    queryName: $queryName,
-    columns: <ViewColumnElement>${[...columns.map((c) => c.paramName)]},
-  )''';
-}
+//   @override
+//   String toString() => '''ViewElement(
+//     table: $table,
+//     name: $name,
+//     isDefaultView: $isDefaultView,
+//     className: $className,
+//     viewTableName: $viewTableName,
+//     queryName: $queryName,
+//     columns: <ViewColumnElement>${[...columns.map((c) => c.paramName)]},
+//   )''';
+// }

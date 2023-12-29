@@ -10,6 +10,24 @@ import 'migration/output.dart';
 import 'migration/patcher.dart';
 import 'migration/schema.dart';
 
+class Database extends PgDatabase {
+  Database({
+    super.debugPrint,
+    super.host,
+    super.port,
+    super.database,
+    super.user,
+    super.password,
+    super.useSSL,
+    super.timeoutInSeconds = 30,
+    super.queryTimeoutInSeconds = 30,
+    super.timeZone = 'UTC',
+    super.isUnixSocket,
+    super.allowClearTextPassword = false,
+    super.replicationMode = ReplicationMode.none,
+  });
+}
+
 class MigrateCommand extends Command<void> {
   MigrateCommand() {
     argParser.addFlag(
@@ -115,7 +133,7 @@ class MigrateCommand extends Command<void> {
     var isUnixSocket =
         resolveProperty<bool>(arg: 'unix-socket', env: 'DB_SOCKET');
 
-    var db = PgDatabase(
+    var db = Database(
       host: dbHost,
       port: dbPort,
       database: dbName,

@@ -53,11 +53,11 @@ class ForeignColumnElement extends ColumnElement
   String toString() => '''ForeignColumnElement(
     parentTable.tableName: ${parentTable.tableName},
     linkedTable.tableName: ${linkedTable.tableName},
-    paramName: $paramName,
-    columnName: $columnName,
+    paramName: \$paramName (null check!),
+    columnName: \$columnName (null check!),
     isList: $isList,
     isNullable: $isNullable,
-    referencedColumn.paramName: ${referencedColumn.paramName},
+    referencedColumn.paramName: \${referencedColumn.paramName} has not been initialized!,
     sqlType: $sqlType,
     rawSqlType: $rawSqlType,
   )''';

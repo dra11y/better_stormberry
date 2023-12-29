@@ -41,7 +41,7 @@ class ReferenceColumnElement extends ColumnElement
     parentTable.tableName: ${parentTable.tableName},
     linkedTable.tableName: ${linkedTable.tableName},
     paramName: $paramName,
-    referencedColumn.columnName: ${referencedColumn.columnName},
+    referencedColumn.columnName: \${referencedColumn.columnName} has not been initialized!,
     isList: $isList,
     isNullable: $isNullable,
   )''';

@@ -2,11 +2,14 @@ import 'package:magic_orm/magic_orm.dart';
 import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 
 import 'models.export.dart';
+import 'models/account.dart';
 import 'models/address.dart';
 import 'models/company.dart';
+import 'models/invoice.dart';
 import 'models/latlng.dart';
+import 'models/party.dart';
 
-part 'main.schema.dart';
+// part 'main.schema.dart';
 
 @MagicDatabase(models: models)
 class Database extends PgDatabase {
@@ -25,35 +28,35 @@ Future<void> main() async {
 
   db.debugPrint = true;
 
-  await db.companies.deleteOne('abc');
+  // await db.companies.deleteOne('abc');
 
-  await db.companies.insertOne(CompanyInsertRequest(
-    id: 'abc',
-    name: 'Minga',
-    addresses: [],
-  ));
+  // await db.companies.insertOne(Company(
+  //   id: 'abc',
+  //   name: 'Minga',
+  //   primaryAddress: null,
+  //   secondaryAddresses: [],
+  // ));
 
-  await db.accounts.deleteMany([0, 1, 2]);
+  // await db.accounts.deleteMany([0, 1, 2]);
 
-  var accountId = await db.accounts.insertOne(AccountInsertRequest(
-    firstName: 'Test',
-    lastName: 'User',
-    location: LatLng(1, 2),
-    billingAddress: BillingAddress(
-        name: 'Test User',
-        street: 'SomeRoad 1',
-        city: 'New York',
-        postcode: '123'),
-    companyId: 'abc',
-  ));
+  // var accountId = await db.accounts.insertOne(Account(
+  //   firstName: 'Test',
+  //   lastName: 'User',
+  //   location: LatLng(1, 2),
+  //   billingAddress: BillingAddress(
+  //       name: 'Test User',
+  //       street: 'SomeRoad 1',
+  //       city: 'New York',
+  //       postcode: '123'),
+  // ));
 
-  var account = await db.accounts.queryUserView(accountId);
+  // var account = await db.accounts.queryUserView(accountId);
 
-  print(account!.id);
+  // print(account!.id);
 
-  var company = await db.companies.queryFullView('abc');
+  // var company = await db.companies.queryFullView('abc');
 
-  print(company!.id);
+  // print(company!.id);
 
   await db.close();
 }

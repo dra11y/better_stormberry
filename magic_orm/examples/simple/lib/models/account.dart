@@ -1,4 +1,3 @@
-import 'package:magic_orm/magic_orm.dart';
 import 'package:magic_orm_annotations/magic_orm_annotations.dart';
 
 import 'address.dart';
@@ -7,11 +6,13 @@ import 'invoice.dart';
 import 'latlng.dart';
 import 'party.dart';
 
-@Model(views: [#Full, #User, #Company])
+part 'account.relation.dart';
+
+@Model()
 class Account {
   @PrimaryKey()
   @AutoIncrement()
-  final int id;
+  final int? id;
 
   // Fields
   final String firstName;
@@ -21,34 +22,30 @@ class Account {
   @UseConverter(LatLngConverter())
   final LatLng location;
 
-  // Foreign Object
-  @HiddenIn(#Company)
-  final BillingAddress? billingAddress;
-
-  @HiddenIn(#Company)
-  @ViewedIn(#Full, as: #Owner)
-  @ViewedIn(#User, as: #Owner)
-  final List<Invoice> invoices;
-
-  @HiddenIn(#Company)
-  @ViewedIn(#Full, as: #Member)
-  @ViewedIn(#User, as: #Member)
+  @BelongsTo()
   final Company? company;
 
-  @ViewedIn(#Company, as: #Company)
-  @TransformedIn(#Company, by: FilterByField('sponsor_id', '=', 'company_id'))
-  @ViewedIn(#Full, as: #Guest)
-  @ViewedIn(#User, as: #Guest)
+  // Foreign Object
+  @HasOne()
+  final BillingAddress? billingAddress;
+
+  @HasMany()
+  final List<Invoice> invoices;
+
+  // @TransformedIn(#Company, by: FilterByField('sponsor_id', '=', 'company_id'))
   final List<Party> parties;
 
+  final $AccountRelationInfo relationInfo;
+
   const Account({
-    required this.id,
+    this.id,
     required this.firstName,
     required this.lastName,
     required this.location,
-    required this.billingAddress,
-    required this.invoices,
-    required this.company,
-    required this.parties,
+    this.billingAddress,
+    this.invoices = const [],
+    this.company,
+    this.parties = const [],
+    this.relationInfo = const $AccountRelationInfo(),
   });
 }

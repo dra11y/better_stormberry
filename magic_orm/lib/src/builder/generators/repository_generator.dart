@@ -8,22 +8,24 @@ import 'update_generator.dart';
 import 'view_generator.dart';
 
 class RepositoryGenerator {
+  const RepositoryGenerator();
+
   final String databaseType = 'PgDatabase';
 
   String generateRepositories(AssetState state) {
-    return '''
+    return [
+      '''
     extension ${CaseStyle.pascalCase.transform(p.withoutExtension(state.filename))}Repositories on $databaseType {
       ${state.tables.values.map((b) => '  ${b.element.name}Repository get ${b.repoName} => ${b.element.name}Repository._(this);\n').join()}
     }
-
-    ${state.tables.values.map((t) => generateRepository(t)).join()}
-
-    ${state.tables.values.map((t) => InsertGenerator().generateInsertRequest(t)).join()}
-
-    ${state.tables.values.map((t) => UpdateGenerator().generateUpdateRequest(t)).join()}
-
-    ${state.tables.values.map((t) => ViewGenerator().generateViewClasses(t)).join()}
-  ''';
+    ''',
+      ...state.tables.values.expand((t) => [
+            generateRepository(t),
+            // const InsertGenerator().generateInsertRequest(t),
+            // const UpdateGenerator().generateUpdateRequest(t),
+            // const ViewGenerator().generateViewClasses(t),
+          ]),
+    ].join();
   }
 
   String generateRepository(TableElement table) {
