@@ -1,7 +1,7 @@
 import 'package:build/build.dart';
 import 'package:test/test.dart';
 
-import 'utils.dart';
+import 'test_generate_utils.dart';
 
 final modelSchemaId = AssetId.parse('model|model.schema.dart');
 

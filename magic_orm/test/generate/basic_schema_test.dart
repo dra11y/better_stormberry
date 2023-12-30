@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'utils.dart';
+import 'test_generate_utils.dart';
 
 void main() {
   group('schema builder', () {

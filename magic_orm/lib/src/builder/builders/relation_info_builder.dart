@@ -60,7 +60,7 @@ class RelationInfoGenerator extends Generator {
                 ..extend = referType(RelationInfo)
                 ..fields.addAll([
                   for (final field in model.fields)
-                    if (field.metadata.any((m) => anyRelationChecker
+                    if (field.metadata.any((m) => hasRelationChecker
                         .isExactly(m.element!.enclosingElement!)))
                       Field((f) => f
                         ..type = refer('bool')

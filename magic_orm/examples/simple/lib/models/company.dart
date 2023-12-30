@@ -17,10 +17,10 @@ class Company with CompanyMappable {
   @PrimaryKey(multi: true)
   final String name;
 
-  @HasOne(foreignKeyField: #companyPrimary)
+  @HasOne(foreignKey: #companyPrimary)
   final BillingAddress? primaryAddress;
 
-  @HasMany(foreignKeyField: #companySecondary)
+  @HasMany(foreignKey: #companySecondary)
   final List<BillingAddress> secondaryAddresses;
 
   @HasMany()
@@ -29,7 +29,7 @@ class Company with CompanyMappable {
   @HasMany()
   final List<Invoice> invoices;
 
-  @HasMany(foreignKeyField: #sponsor)
+  @HasMany(foreignKey: #sponsor)
   final List<Party> parties;
 
   @BelongsTo(optional: true)

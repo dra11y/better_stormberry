@@ -117,6 +117,23 @@ class TableElement {
   }();
 
   void prepareColumns() {
+    final annotations = ModelAnnotations(element, allFields);
+    for (final field in allFields) {
+      if (field.type is InvalidType) {
+        throw Exception(
+            'Field `${field.name}` on ${element.name} has an invalid type.\n\nSource: ${field.source}');
+      }
+      _prepareField(field, annotations.fields[field]!);
+    }
+  }
+
+  void _prepareField(FieldElement field, FieldAnnotations fieldAnnotations) {
+    if (fieldAnnotations.isNotEmpty) {
+      print('$fieldAnnotations');
+    }
+  }
+
+  void oldPrepareColumns() {
     stdout
         .writeln('\n==================== ${element.name} ====================');
 

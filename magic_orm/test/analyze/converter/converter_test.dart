@@ -1,7 +1,7 @@
 import 'package:magic_orm/src/builder/elements/column/column_element.dart';
 import 'package:test/test.dart';
 
-import '../utils.dart';
+import '../test_utils.dart';
 
 void main() {
   group('analyzing builder', () {

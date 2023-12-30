@@ -32,8 +32,9 @@ class AnalyzingBuilder implements Builder {
       await analyze(state, library, buildStep.inputId);
     } catch (e, st) {
       state.hasError = true;
-      print('\x1B[31mFailed to build database schema:\n\n$e\x1B[0m\n');
+      print('\x1B[31mFailed to analyze database schema:\n\n$e\x1B[0m\n');
       print(st);
+      return;
     }
   }
 

@@ -24,7 +24,7 @@ class SchemaState {
 
   AssetState createForAsset(AssetId assetId) {
     assert(!_didFinalize, 'Schema was already finalized.');
-    var asset = AssetState(p.basename(assetId.path));
+    final asset = AssetState(p.basename(assetId.path));
     return _assets[assetId] = asset;
   }
 
@@ -35,13 +35,13 @@ class SchemaState {
 
   void finalize() {
     if (!_didFinalize) {
-      for (var element in tables.values) {
-        element.prepareColumns();
+      for (final table in tables.values) {
+        table.prepareColumns();
       }
-      for (var element in tables.values) {
-        element.sortColumns();
+      for (final table in tables.values) {
+        table.sortColumns();
       }
-      // for (var element in tables.values) {
+      // for (final element in tables.values) {
       //   element.analyzeViews();
       // }
       _didFinalize = true;

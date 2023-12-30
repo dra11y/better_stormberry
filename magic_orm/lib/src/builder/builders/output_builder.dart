@@ -40,8 +40,10 @@ abstract class OutputBuilder implements Builder {
             buildStep.inputId.changeExtension('.schema.$ext'), output);
       }
     } catch (e, st) {
+      state.hasError = true;
       print('\x1B[31mFailed to build database schema:\n\n$e\x1B[0m\n');
       print(st);
+      return;
     }
   }
 

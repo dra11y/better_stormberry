@@ -1,10 +1,11 @@
+import 'magic_annotation.dart';
 import 'model_meta.dart';
 import 'table_index.dart';
 
 /// Used to annotate a class as a database model
 ///
 /// {@category Models}
-class Model {
+class Model extends MagicAnnotation {
   /// The list of views this model defined.
   // final List<Symbol> views;
 
@@ -26,4 +27,8 @@ class Model {
 
   /// The default view of a model.
   // static const Symbol defaultView = #$default$;
+
+  @override
+  String toString() =>
+      '$runtimeType(tableName: $tableName, indexes: $indexes, meta: $meta)';
 }

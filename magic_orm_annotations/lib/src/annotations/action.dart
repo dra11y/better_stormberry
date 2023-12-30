@@ -1,5 +1,3 @@
-import 'package:magic_orm_annotations/src/index.dart';
-
 import 'base_database.dart';
 
 /// Extend this to define a custom action.

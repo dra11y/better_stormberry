@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import '../utils.dart';
+import '../test_utils.dart';
 
 void main() {
   group('analyzing builder', () {

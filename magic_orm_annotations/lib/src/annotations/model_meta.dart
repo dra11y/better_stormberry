@@ -23,4 +23,8 @@ class ModelMeta {
         update = meta,
         view = meta,
         views = null;
+
+  @override
+  String toString() =>
+      'ModelMeta(insert: $insert, update: $update, view: $view)';
 }
